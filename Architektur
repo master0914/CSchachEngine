@@ -1,0 +1,108 @@
+┌─────────────────────────────────────────────────────────────┐
+│                    GameContainer (dein Framework)           │
+├─────────────────────────────────────────────────────────────┤
+│  - update(float deltaTime)                                  │
+│  - render()                                                 │
+│  - handleInput()                                            │
+└───────────────────────┬─────────────────────────────────────┘
+                        │
+┌───────────────────────┴─────────────────────────────────────┐
+│                    ChessApplication                         │
+├─────────────────────────────────────────────────────────────┤
+│  - m_chessGame: ChessGame                                   │
+│  - m_renderer: Renderer2D                                   │
+│  - m_uiManager: ChessUIManager                              │
+│  + onUpdate()                                               │
+│  + onRender()                                               │
+│  + onInput()                                                │
+└───────────────────────┬─────────────────────────────────────┘
+                        │
+┌───────────────────────┴─────────────────────────────────────┐
+│                      ChessGame                              │
+├─────────────────────────────────────────────────────────────┤
+│  - m_board: ChessBoard                                      │
+│  - m_players[2]: IPlayer*                                   │
+│  - m_gameState: GameState                                   │
+│  - m_moveHistory: vector<Move>                              │
+│  + makeMove(Move)                                           │
+│  + getValidMoves()                                          │
+│  + isCheck()                                                │
+│  + isCheckmate()                                            │
+│  + undoMove()                                               │
+└─────────────┬───────────────────────────────┬───────────────┘
+              │                               │
+┌─────────────┴─────────────┐ ┌───────────────┴─────────────┐
+│        ChessBoard         │ │        IPlayer              │
+├───────────────────────────┤ ├─────────────────────────────┤
+│  - m_bitboards[12]        │ │  + getMove(ChessGame&)      │
+│  - m_occupancy[2]         │ │  + isHuman() const          │
+│  - m_enPassantSquare      │ │  + getColor() const         │
+│  - m_castlingRights       │ └───────────────┬─────────────┘
+│  + getPieceAt(square)     │                 │
+│  + setPieceAt(square)     │ ┌───────────────┴─────────────┐
+│  + getOccupancy()         │ │          Player             │
+│  + getAttackers()         │ ├─────────────────────────────┤
+└─────────────┬─────────────┘ │  - m_color: Color           │
+              │               │  - m_type: PlayerType       │
+┌─────────────┴─────────────┐ │  + getMove() override       │
+│        Bitboard           │ └───────────────┬─────────────┘
+├───────────────────────────┤                 │
+│  - m_value: uint64_t      │ ┌───────────────┴─────────────┐
+│  + setBit(square)         │ │         HumanPlayer         │
+│  + clearBit(square)       │ ├─────────────────────────────┤
+│  + getBit(square)         │ │  - m_inputSystem            │
+│  + shift(direction)       │ │  + handleMouseClick()       │
+│  + and/or/xor()           │ │  + getMove() override       │
+└─────────────┬─────────────┘ └─────────────────────────────┘
+              │
+┌─────────────┴─────────────┐ ┌─────────────────────────────┐
+│        MoveGenerator      │ │         AIPlayer            │
+├───────────────────────────┤ ├─────────────────────────────┤
+│  - generatePawnMoves()    │ │  - m_searchDepth            │
+│  - generateKnightMoves()  │ │  - m_evaluator              │
+│  - generateKingMoves()    │ │  + getMove() override       │
+│  - generateSlidingMoves() │ │  + searchBestMove()         │
+│  + generateAllMoves()     │ └─────────────────────────────┘
+└─────────────┬─────────────┘
+              │
+┌─────────────┴─────────────┐ ┌─────────────────────────────┐
+│        Move               │ │         Evaluator           │
+├───────────────────────────┤ ├─────────────────────────────┤
+│  - m_from: Square         │ │  - evaluateMaterial()       │
+│  - m_to: Square           │ │  - evaluatePosition()       │
+│  - m_piece: PieceType     │ │  - evaluateMobility()       │
+│  - m_flags: MoveFlags     │ │  + evaluate(Board)          │
+│  + isCapture()            │ └─────────────────────────────┘
+│  + isPromotion()          │
+│  + isCastle()             │
+└───────────────────────────┘
+
+
+
+
+SchachEngine/
+├── src/
+│   ├── core/
+│   │   ├── ChessGame.cpp/h          # Hauptspiel-Logik
+│   │   ├── ChessBoard.cpp/h         # Brett-Zustand
+│   │   ├── Bitboard.cpp/h           # Bitboard Operationen
+│   │   ├── Move.cpp/h               # Zug-Repräsentation
+│   │   └── GameState.cpp/h          # Spielzustand
+│   ├── moves/
+│   │   ├── MoveGenerator.cpp/h      # Zug-Generierung
+│   │   └── MoveValidator.cpp/h      # Zug-Validierung
+│   ├── players/
+│   │   ├── IPlayer.cpp/h            # Interface
+│   │   ├── HumanPlayer.cpp/h        # Menschlicher Spieler
+│   │   └── AIPlayer.cpp/h           # KI-Spieler (später)
+│   ├── evaluation/
+│   │   ├── Evaluator.cpp/h          # Positionsbewertung
+│   │   └── PieceSquareTables.cpp/h  # Positionstabelle
+│   ├── interface/
+│   │   ├── ChessApplication.cpp/h   # Hauptanwendung
+│   │   └── ChessUIManager.cpp/h     # UI Management
+│   └── utils/
+│       ├── Constants.cpp/h          # Konstanten
+│       └── Helpers.cpp/h            # Hilfsfunktionen
+└── assets/
+    └── pieces/                      # Figuren-Sprites
