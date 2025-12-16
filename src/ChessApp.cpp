@@ -11,7 +11,7 @@ namespace Chess {
     }
 
     void ChessApp::render() {
-        m_ui.render();
+        m_ui.render(m_board);
     }
 
     void ChessApp::onInit() {

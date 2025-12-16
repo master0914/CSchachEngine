@@ -24,6 +24,10 @@ add_executable(SchachEngine
         src/util/Helper.h
         src/players/IPlayer.h
         src/main.cpp
+        src/ChessApp.cpp
+        src/ChessApp.h
+        src/core/UIManager.h
+        src/core/UIManager.cpp
 )
 
 

@@ -18,6 +18,17 @@ namespace Chess {
     }
 
     PieceType ChessBoard::getPieceAt(Square square) {
+        if (!(m_occupied.getBit(square))) {
+            return PieceType::NO_PIECE;
+        }
+        for (uint8_t pieceType = static_cast<uint8_t>(PieceType::WHITE_PAWN);
+            pieceType <= static_cast<uint8_t>(PieceType::BLACK_KING);
+            pieceType++) {
+            if (m_bitboards[pieceType - 1].getBit(square)) {
+                return static_cast<PieceType>(pieceType);
+            }
+        }
+        return PieceType::NO_PIECE;
     }
 
     Bitboard ChessBoard::getAttackers(Square) {
@@ -72,7 +83,7 @@ namespace Chess {
         return fen;
     }
 
-    void ChessBoard::fromFEN(std::string& fen) {
+    void ChessBoard::fromFEN(const std::string& fen) {
         // danke an deepseek für diesen gut bekannten algoritmus den ich nicht selber an meine implementation anpassen musste :)
 
         // Board zurücksetzen
@@ -98,8 +109,9 @@ namespace Chess {
                 file += (c - '0');
             } else {
                 // Figur platzieren
-                Square square = static_cast<Square>(rank * 8 + file);
-                PieceType piece = charToPiece(c);
+                const auto square = static_cast<Square>(rank * 8 + file);
+                const PieceType piece = charToPiece(c);
+                if (piece == PieceType::BLACK_KING){std::cout<< "TADAAAA" << std::endl;}
                 setPieceAt(square, piece);
                 file++;
             }
@@ -111,12 +123,13 @@ namespace Chess {
         // 3. Castling rights
         uint8_t castlingTemp = 0;
         if(castling != "-") {
-            for(char c : castling) {
+            for(const char c : castling) {
                 switch(c) {
                     case 'K': castlingTemp  |= WHITE_KINGSIDE; break;
                     case 'Q': castlingTemp  |= WHITE_QUEENSIDE; break;
                     case 'k': castlingTemp  |= BLACK_KINGSIDE; break;
                     case 'q': castlingTemp  |= BLACK_QUEENSIDE; break;
+                    default: break;
                 }
             }
         }
@@ -149,6 +162,10 @@ namespace Chess {
     bool ChessBoard::isDraw() const {
     }
 
+    Bitboard ChessBoard::getBitboard(PieceType pieceType) const {
+        return m_bitboards[static_cast<int>(pieceType)-1];
+    }
+
     void ChessBoard::clear() {
         for(auto & m_bitboard : m_bitboards) {
             m_bitboard = Bitboard(0);
@@ -168,14 +185,14 @@ namespace Chess {
        // altes muss entfernt werden da in verschiedenen bitboards gespeichert
         PieceType oldPiece = getPieceAt(square);
         if(oldPiece != PieceType::NO_PIECE) {
-            int oldIndex = static_cast<int>(oldPiece);
+            int oldIndex = static_cast<int>(oldPiece) - 1;
             m_bitboards[oldIndex].clearBit(square);
 
             Color oldColor = getPieceColor(oldPiece);
             m_occupancy[static_cast<int>(oldColor)].clearBit(square);
         }
         if(piece != PieceType::NO_PIECE) {
-            int newIndex = static_cast<int>(piece);
+            int newIndex = static_cast<int>(piece) - 1;
             m_bitboards[newIndex].setBit(square);
 
             Color newColor = getPieceColor(piece);

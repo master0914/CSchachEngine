@@ -24,6 +24,9 @@ namespace Chess {
         void onExit() override;
     private:
         UIManager m_ui{m_context};
+
+        // nur zum testen TODO: remove
+        ChessBoard m_board;
     };
 }
 

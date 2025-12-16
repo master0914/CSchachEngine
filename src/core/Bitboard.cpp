@@ -71,4 +71,16 @@ namespace Chess {
     int Bitboard::hsb() const {
         return 63 - __builtin_clzll(m_value);
     }
+
+    void Bitboard::debugPrint() const {
+        for (int rank = 0; rank < 8; ++rank) {          // 8 → 1
+            for (int file = 0; file < 8; ++file) {       // a → h
+                int bitIndex = rank * 8 + file;
+                bool isSet = (m_value >> bitIndex) & 1ULL;
+
+                std::cout << (isSet ? "1 " : ". ");
+            }
+            std::cout << '\n';
+        }
+    }
 }

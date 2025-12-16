@@ -29,6 +29,7 @@ namespace Chess {
         int popCount() const;  // wie biele bits gesetzt sind
         int lsb() const;       // lowest set bit
         int hsb() const;       // highest set bit
+        void debugPrint() const;
     private:
         uint64_t m_value;
     };

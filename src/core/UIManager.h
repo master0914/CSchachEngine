@@ -14,7 +14,7 @@ namespace Chess {
             UIManager(Engine::EngineContext& context) : m_context(context), m_renderer(*context.renderer2D), m_width(context.window->getm_Width()),
                                                         m_height(context.window->getm_Height()) {
             };
-            void render();
+            void render(ChessBoard board);  // TODO: ChessBoard zu ChessGame wechseln
             void renderBackground();
             void renderBoard(ChessBoard board);
             void loadImages();
@@ -24,6 +24,15 @@ namespace Chess {
             // PieceType - 1 = imageID
             std::vector<int> m_imgIDs;
             int m_width, m_height;
+            // board parameter
+            int m_boardOffsetX = 0;
+            int m_boardOffsetY = 0;
+            int m_boardWidth = 512;  // muss so bleiben
+            int m_boardHeight = 512; // muss so bleiben
+            int m_squareSize = 64;
+            uint32_t m_colorBlack = 0xff5b3a29;
+            uint32_t m_colorWhite = 0xffd7b891;
+            int m_pieceOffsetXnY = 10; // die sprites sind alle 45x45 also müssen sie im feld zentriert werden
     };
 }
 

@@ -31,12 +31,14 @@ namespace Chess {
         Bitboard getAttackers(Square square);
         // FEN helper
         std::string toFEN();
-        void fromFEN(std::string& fen);
+        void fromFEN(const std::string& fen);
         // game state helper
         bool isCheck() const;
         bool isCheckmate() const;
         bool isStalemate() const;
         bool isDraw() const;
+
+        Bitboard getBitboard(PieceType pieceType) const;
     private:
         // TODO: Zobrist Hashing
 
