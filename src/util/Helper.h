@@ -13,32 +13,49 @@
 
 namespace Chess {
     enum class Color: bool {
-        White = false,
-        Black = true
+        WHITE = false,
+        BLACK = true
     };
-    enum class PieceType : uint8_t {
-        NO_PIECE = 0,
-        WHITE_PAWN = 1,   // 0001
-        WHITE_KNIGHT = 2, // 0010
-        WHITE_BISHOP = 3, // 0011
-        WHITE_ROOK = 4,   // 0100
-        WHITE_QUEEN = 5,  // 0101
-        WHITE_KING = 6,   // 0110
-        BLACK_PAWN = 7,   // 0111
-        BLACK_KNIGHT = 8, // 1000
-        BLACK_BISHOP = 9, // 1001
-        BLACK_ROOK = 10,  // 1010
-        BLACK_QUEEN = 11, // 1011
-        BLACK_KING = 12   // 1100
+    // enum class PieceType : uint8_t {
+    //     NO_PIECE = 0,
+    //     WHITE_PAWN = 1,   // 0001
+    //     WHITE_KNIGHT = 2, // 0010
+    //     WHITE_BISHOP = 3, // 0011
+    //     WHITE_ROOK = 4,   // 0100
+    //     WHITE_QUEEN = 5,  // 0101
+    //     WHITE_KING = 6,   // 0110
+    //     BLACK_PAWN = 7,   // 0111
+    //     BLACK_KNIGHT = 8, // 1000
+    //     BLACK_BISHOP = 9, // 1001
+    //     BLACK_ROOK = 10,  // 1010
+    //     BLACK_QUEEN = 11, // 1011
+    //     BLACK_KING = 12   // 1100
+    // };
+    enum class SimplePieceType : uint8_t {
+        NONE = 0,
+        PAWN = 1,
+        KNIGHT = 2,
+        BISHOP = 3,
+        ROOK = 4,
+        QUEEN = 5,
+        KING = 6
     };
-    enum class MoveFlags : uint8_t {
-        NORMAL = 0,           // 0000
-        CAPTURE = 1,          // 0001
-        CASTLE_KINGSIDE = 2,  // 0010
-        CASTLE_QUEENSIDE = 3, // 0011
-        EN_PASSANT = 4,       // 0100
-        DOUBLE_PAWN_PUSH = 5, // 0101
-        PROMOTION = 6,        // 0110
+    enum Flag:uint8_t {
+        NORMAL = 0x0,           // 0000
+        CAPTURE = 0x1,          // 0001
+        PROMO_Q = 0x2,          // 0010
+        CAPTURE_PROMO_Q = 0x3,  // 0011
+        PROMO_R = 0x4,          // 0100
+        CAPTURE_PROMO_R = 0x5,  // 0101
+        PROMO_B = 0x6,          // 0110
+        CAPTURE_PROMO_B = 0x7,  // 0111
+        PROMO_N = 0x8,          // 1000
+        CAPTURE_PROMO_N = 0x9,  // 1001
+        EN_PASSANT = 0xA,       // 1010
+        CASTEL_KINGSIDE = 0xB,  // 1011
+        CASTLE_QUEENSID = 0xC,  // 1100
+        DOUBLE_PAWN_PUSH = 0xD  // 1101
+        // 0xE und 0xF können noch für anderen shit verwendet werden
     };
     enum Square : uint8_t {
         A1 = 0,  B1 = 1,  C1 = 2,  D1 = 3,  E1 = 4,  F1 = 5,  G1 = 6,  H1 = 7,
@@ -82,60 +99,60 @@ namespace Chess {
         int rank = str[1] - '1';
         return static_cast<Square>(rank * 8 + file);
     }
-    // STRING-PIECE
-    inline std::string pieceToChar(PieceType piece) {
-        switch (piece) {
-            case PieceType::NO_PIECE:
-                return "";
-            case PieceType::WHITE_PAWN:
-                return "P";
-            case PieceType::WHITE_KNIGHT:
-                return "N";
-            case PieceType::WHITE_BISHOP:
-                return "B";
-            case PieceType::WHITE_ROOK:
-                return "R";
-            case PieceType::WHITE_QUEEN:
-                return "Q";
-            case PieceType::WHITE_KING:
-                return "K";
-            case PieceType::BLACK_PAWN:
-                return "p";
-            case PieceType::BLACK_KNIGHT:
-                return "n";
-            case PieceType::BLACK_BISHOP:
-                return "b";
-            case PieceType::BLACK_ROOK:
-                return "r";
-            case PieceType::BLACK_QUEEN:
-                return "q";
-            case PieceType::BLACK_KING:
-                return "k";
-        }
-        std::cerr << "Unknown piece type: " << static_cast<int>(piece) << std::endl;
-        return "";
-    }
-    inline PieceType charToPiece(char c) {
-        // danke an deepseek
-        switch(c) {
-            case 'P': return PieceType::WHITE_PAWN;
-            case 'N': return PieceType::WHITE_KNIGHT;
-            case 'B': return PieceType::WHITE_BISHOP;
-            case 'R': return PieceType::WHITE_ROOK;
-            case 'Q': return PieceType::WHITE_QUEEN;
-            case 'K': return PieceType::WHITE_KING;
-            case 'p': return PieceType::BLACK_PAWN;
-            case 'n': return PieceType::BLACK_KNIGHT;
-            case 'b': return PieceType::BLACK_BISHOP;
-            case 'r': return PieceType::BLACK_ROOK;
-            case 'q': return PieceType::BLACK_QUEEN;
-            case 'k': return PieceType::BLACK_KING;
-            default: return PieceType::NO_PIECE;
-        }
-    }
-    // other piece help
-    inline Color getPieceColor(PieceType piece) {
-        if(piece == PieceType::NO_PIECE) {return Color::White; }
-        return (static_cast<int>(piece) < 6) ? Color::White : Color::Black;
-    }
+    // // STRING-PIECE
+    // inline std::string pieceToChar(PieceType piece) {
+    //     switch (piece) {
+    //         case PieceType::NO_PIECE:
+    //             return "";
+    //         case PieceType::WHITE_PAWN:
+    //             return "P";
+    //         case PieceType::WHITE_KNIGHT:
+    //             return "N";
+    //         case PieceType::WHITE_BISHOP:
+    //             return "B";
+    //         case PieceType::WHITE_ROOK:
+    //             return "R";
+    //         case PieceType::WHITE_QUEEN:
+    //             return "Q";
+    //         case PieceType::WHITE_KING:
+    //             return "K";
+    //         case PieceType::BLACK_PAWN:
+    //             return "p";
+    //         case PieceType::BLACK_KNIGHT:
+    //             return "n";
+    //         case PieceType::BLACK_BISHOP:
+    //             return "b";
+    //         case PieceType::BLACK_ROOK:
+    //             return "r";
+    //         case PieceType::BLACK_QUEEN:
+    //             return "q";
+    //         case PieceType::BLACK_KING:
+    //             return "k";
+    //     }
+    //     std::cerr << "Unknown piece type: " << static_cast<int>(piece) << std::endl;
+    //     return "";
+    // }
+    // inline PieceType charToPiece(char c) {
+    //     // danke an deepseek
+    //     switch(c) {
+    //         case 'P': return PieceType::WHITE_PAWN;
+    //         case 'N': return PieceType::WHITE_KNIGHT;
+    //         case 'B': return PieceType::WHITE_BISHOP;
+    //         case 'R': return PieceType::WHITE_ROOK;
+    //         case 'Q': return PieceType::WHITE_QUEEN;
+    //         case 'K': return PieceType::WHITE_KING;
+    //         case 'p': return PieceType::BLACK_PAWN;
+    //         case 'n': return PieceType::BLACK_KNIGHT;
+    //         case 'b': return PieceType::BLACK_BISHOP;
+    //         case 'r': return PieceType::BLACK_ROOK;
+    //         case 'q': return PieceType::BLACK_QUEEN;
+    //         case 'k': return PieceType::BLACK_KING;
+    //         default: return PieceType::NO_PIECE;
+    //     }
+    // }
+    // // other piece help
+    // inline Color getPieceColor(PieceType piece) {
+    //     if(piece == PieceType::NO_PIECE) {return Color::White; }
+    //     return (static_cast<int>(piece) < 6) ? Color::White : Color::Black;
+    // }
 }

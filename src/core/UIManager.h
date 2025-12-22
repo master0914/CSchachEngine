@@ -6,21 +6,28 @@
 #define SCHACHENGINE_UIMANAGER_H
 #pragma once
 #include "ChessBoard.h"
+#include "ChessGame.h"
 #include "EngineContext.h"
 
 namespace Chess {
     class UIManager {
         public:
-            UIManager(Engine::EngineContext& context) : m_context(context), m_renderer(*context.renderer2D), m_width(context.window->getm_Width()),
-                                                        m_height(context.window->getm_Height()) {
+            UIManager(Engine::EngineContext& context, ChessGame& game) : m_context(context), m_renderer(*context.renderer2D), m_width(context.window->getm_Width()),
+                                                        m_height(context.window->getm_Height()), m_game(game) {
             };
-            void render(ChessBoard board);  // TODO: ChessBoard zu ChessGame wechseln
+            void update();
+            void render();
             void renderBackground();
-            void renderBoard(ChessBoard board);
+            void renderBoard();
             void loadImages();
         private:
             Engine::EngineContext& m_context;
             Engine::Renderer_2D& m_renderer;
+            ChessGame& m_game;
+            // Inputstuff -------------------
+            int m_selectedSquare;
+            bool m_isPieceSelected;
+            // Renderstuff -----------------
             // PieceType - 1 = imageID
             std::vector<int> m_imgIDs;
             int m_width, m_height;

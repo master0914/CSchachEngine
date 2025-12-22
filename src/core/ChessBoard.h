@@ -10,6 +10,7 @@
 
 #include "Bitboard.h"
 #include "Move.h"
+#include "Piece.h"
 #include "../util/Helper.h"
 
 namespace Chess {
@@ -18,7 +19,7 @@ namespace Chess {
         Square enPassantSquare;
         int halfMoveClock;
         int fullMoveNumber;
-        PieceType capturedPiece;
+        Piece capturedPiece;
     };
     class ChessBoard {
     public:
@@ -27,7 +28,7 @@ namespace Chess {
         void makeMove(Move& move);
         void undoMove(Move& move);
         // getter
-        PieceType getPieceAt(Square square);
+        Piece getPieceAt(Square square) const;
         Bitboard getAttackers(Square square);
         // FEN helper
         std::string toFEN();
@@ -38,16 +39,23 @@ namespace Chess {
         bool isStalemate() const;
         bool isDraw() const;
 
-        Bitboard getBitboard(PieceType pieceType) const;
+        Bitboard getBitboard(Piece pieceType) const;
+        Bitboard getOccupied() const;
     private:
         // TODO: Zobrist Hashing
 
         void clear();
         void reset();
-        void setPieceAt(Square square, PieceType piece);
+        void setPieceAt(Square square, Piece piece);
         void updateOccupancy();
 
-        Bitboard m_bitboards[12];   // based on the piecetypes.   see: helper
+        Bitboard m_pawns[2];
+        Bitboard m_knights[2];
+        Bitboard m_bishops[2];
+        Bitboard m_rooks[2];
+        Bitboard m_queens[2];
+        Bitboard m_kings[2];
+
         Bitboard m_occupancy[2];    // Colors: white = 0, black = 1
         Bitboard m_occupied;        // all occupied squares  (b and w)
         Color m_sideToMove;

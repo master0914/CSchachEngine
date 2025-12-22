@@ -23,10 +23,10 @@ namespace Chess {
 
         void onExit() override;
     private:
-        UIManager m_ui{m_context};
-
+        ChessGame m_game{};
+        UIManager m_ui{m_context,m_game};
         // nur zum testen TODO: remove
-        ChessBoard m_board;
+        // ChessBoard m_board;
     };
 }
 

@@ -6,9 +6,29 @@
 #define SCHACHENGINE_CHESSGAME_H
 
 #pragma once
+#include "ChessBoard.h"
 
 namespace Chess {
     class ChessGame {
+        public:
+            ChessGame() {
+                m_board = ChessBoard{};
+            }
+            void makeMove(Move& move);
+            void handleClickOnSquare(int square);
+            bool isMoveLegal(Move& move);
+            Piece getPieceAt(int square);
+
+            // const std::vector<Move>& getLegalMoves() const { return m_legalMoves; }
+            // Color getCurrentPlayer() const { return m_currentPlayer; }
+            const ChessBoard& getBoard() const { return m_board; }
+        private:
+            ChessBoard m_board;
+            int m_selectedSquare = -1;
+
+            void updateLegalMoves();
+            bool isValidSelection(int square);
+            void switchPlayer();
     };
 }
 

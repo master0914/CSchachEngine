@@ -28,6 +28,8 @@ add_executable(SchachEngine
         src/ChessApp.h
         src/core/UIManager.h
         src/core/UIManager.cpp
+        src/core/Piece.cpp
+        src/core/Piece.h
 )
 
 

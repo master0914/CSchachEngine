@@ -8,10 +8,11 @@
 
 namespace Chess {
     void ChessApp::update(float dt) {
+        m_ui.update();
     }
 
     void ChessApp::render() {
-        m_ui.render(m_board);
+        m_ui.render();
     }
 
     void ChessApp::onInit() {

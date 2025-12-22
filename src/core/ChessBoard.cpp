@@ -12,23 +12,38 @@ namespace Chess {
     }
 
     void ChessBoard::makeMove(Move &move) {
+        Square from = static_cast<Square>(move.fromSquare());
+        Square to = static_cast<Square>(move.toSquare());
+        Piece mover = getPieceAt(from);
+
+        setPieceAt(from, Piece{});
+        setPieceAt(to, mover);
     }
 
     void ChessBoard::undoMove(Move &move) {
     }
 
-    PieceType ChessBoard::getPieceAt(Square square) {
+    Piece ChessBoard::getPieceAt(Square square) const{
         if (!(m_occupied.getBit(square))) {
-            return PieceType::NO_PIECE;
+            return Piece{};
         }
-        for (uint8_t pieceType = static_cast<uint8_t>(PieceType::WHITE_PAWN);
-            pieceType <= static_cast<uint8_t>(PieceType::BLACK_KING);
-            pieceType++) {
-            if (m_bitboards[pieceType - 1].getBit(square)) {
-                return static_cast<PieceType>(pieceType);
-            }
+        if (m_occupancy[0].getBit(square)) { // WHITE
+            if (m_pawns[0].getBit(square)) return Piece(Color::WHITE, SimplePieceType::PAWN);
+            if (m_knights[0].getBit(square)) return Piece(Color::WHITE, SimplePieceType::KNIGHT);
+            if (m_bishops[0].getBit(square)) return Piece(Color::WHITE, SimplePieceType::BISHOP);
+            if (m_rooks[0].getBit(square)) return Piece(Color::WHITE, SimplePieceType::ROOK);
+            if (m_queens[0].getBit(square)) return Piece(Color::WHITE, SimplePieceType::QUEEN);
+            if (m_kings[0].getBit(square)) return Piece(Color::WHITE, SimplePieceType::KING);
         }
-        return PieceType::NO_PIECE;
+        else { // BLACK
+            if (m_pawns[1].getBit(square)) return Piece(Color::BLACK, SimplePieceType::PAWN);
+            if (m_knights[1].getBit(square)) return Piece(Color::BLACK, SimplePieceType::KNIGHT);
+            if (m_bishops[1].getBit(square)) return Piece(Color::BLACK, SimplePieceType::BISHOP);
+            if (m_rooks[1].getBit(square)) return Piece(Color::BLACK, SimplePieceType::ROOK);
+            if (m_queens[1].getBit(square)) return Piece(Color::BLACK, SimplePieceType::QUEEN);
+            if (m_kings[1].getBit(square)) return Piece(Color::BLACK, SimplePieceType::KING);
+        }
+        return Piece{};
     }
 
     Bitboard ChessBoard::getAttackers(Square) {
@@ -44,16 +59,16 @@ namespace Chess {
 
             for(int file = 0; file < 8; file++) {
                 auto square = static_cast<Square>(rank * 8 + file);
-                PieceType piece = getPieceAt(square);
+                Piece piece = getPieceAt(square);
 
-                if(piece == PieceType::NO_PIECE) {
+                if(piece.isEmpty()) {
                     emptyCount++;
                 } else {
                     if(emptyCount > 0) {
                         fen += std::to_string(emptyCount);
                         emptyCount = 0;
                     }
-                    fen += pieceToChar(piece);
+                    fen += piece.toChar();
                 }
             }
 
@@ -64,7 +79,7 @@ namespace Chess {
         }
 
         // 2. Side to move
-        fen += (m_sideToMove == Color::White) ? " w " : " b ";
+        fen += (m_sideToMove == Color::WHITE) ? " w " : " b ";
 
         // 3. Castling rights
         std::string castling;
@@ -110,15 +125,14 @@ namespace Chess {
             } else {
                 // Figur platzieren
                 const auto square = static_cast<Square>(rank * 8 + file);
-                const PieceType piece = charToPiece(c);
-                if (piece == PieceType::BLACK_KING){std::cout<< "TADAAAA" << std::endl;}
+                const Piece piece = Piece{c};
                 setPieceAt(square, piece);
                 file++;
             }
         }
 
         // 2. Side to move
-        m_sideToMove = (side == "w") ? Color::White : Color::Black;
+        m_sideToMove = (side == "w") ? Color::WHITE : Color::BLACK;
 
         // 3. Castling rights
         uint8_t castlingTemp = 0;
@@ -162,52 +176,123 @@ namespace Chess {
     bool ChessBoard::isDraw() const {
     }
 
-    Bitboard ChessBoard::getBitboard(PieceType pieceType) const {
-        return m_bitboards[static_cast<int>(pieceType)-1];
+    Bitboard ChessBoard::getBitboard(Piece piece) const {
+        if (piece.isEmpty()) {
+            return Bitboard(0);
+        }
+        Color color = piece.color();
+        int colorIndex = static_cast<int>(color);
+        switch (piece.type()) {
+            case SimplePieceType::PAWN:
+                return m_pawns[colorIndex];
+            case SimplePieceType::KNIGHT:
+                return m_knights[colorIndex];
+            case SimplePieceType::BISHOP:
+                return m_bishops[colorIndex];
+            case SimplePieceType::ROOK:
+                return m_rooks[colorIndex];
+            case SimplePieceType::QUEEN:
+                return m_queens[colorIndex];
+            case SimplePieceType::KING:
+                return m_kings[colorIndex];
+            default:
+                return Bitboard(0);
+        }
+    }
+
+    Bitboard ChessBoard::getOccupied() const {
+        return m_occupied;
     }
 
     void ChessBoard::clear() {
-        for(auto & m_bitboard : m_bitboards) {
-            m_bitboard = Bitboard(0);
-        }
+        m_pawns[0] = Bitboard{0};
+        m_pawns[1] = Bitboard{0};
+        m_knights[0] = Bitboard{0};
+        m_knights[1] = Bitboard{0};
+        m_bishops[0] = Bitboard{0};
+        m_bishops[1] = Bitboard{0};
+        m_rooks[0] = Bitboard{0};
+        m_rooks[1] = Bitboard{0};
+        m_queens[0] = Bitboard{0};
+        m_queens[1] = Bitboard{0};
+        m_kings[0] = Bitboard{0};
+        m_kings[1] = Bitboard{0};
+
         m_occupancy[0] = m_occupancy[1] = m_occupied = Bitboard(0);
         m_boardState.enPassantSquare = INVALID_SQUARE;
         m_boardState.castlingRights = static_cast<CastlingRights>(0);
-        m_sideToMove = Color::White;
+        m_sideToMove = Color::WHITE;
         m_boardState.halfMoveClock = m_boardState.fullMoveNumber = 0;
-        m_boardState.capturedPiece = PieceType::NO_PIECE;
+        m_boardState.capturedPiece = Piece{};
     }
 
     void ChessBoard::reset() {
     }
 
-    void ChessBoard::setPieceAt(Square square, PieceType piece) {
-       // altes muss entfernt werden da in verschiedenen bitboards gespeichert
-        PieceType oldPiece = getPieceAt(square);
-        if(oldPiece != PieceType::NO_PIECE) {
-            int oldIndex = static_cast<int>(oldPiece) - 1;
-            m_bitboards[oldIndex].clearBit(square);
-
-            Color oldColor = getPieceColor(oldPiece);
-            m_occupancy[static_cast<int>(oldColor)].clearBit(square);
+    void ChessBoard::setPieceAt(Square square, Piece piece) {
+        Piece oldPiece = getPieceAt(square);
+        if(!oldPiece.isEmpty()) {
+            switch (oldPiece.type()) {
+                case SimplePieceType::PAWN:
+                    m_pawns[static_cast<int>(oldPiece.color())].clearBit(square);
+                    break;
+                case SimplePieceType::KNIGHT:
+                    m_knights[static_cast<int>(oldPiece.color())].clearBit(square);
+                    break;
+                case SimplePieceType::BISHOP:
+                    m_bishops[static_cast<int>(oldPiece.color())].clearBit(square);
+                    break;
+                case SimplePieceType::ROOK:
+                    m_rooks[static_cast<int>(oldPiece.color())].clearBit(square);
+                    break;
+                case SimplePieceType::QUEEN:
+                    m_queens[static_cast<int>(oldPiece.color())].clearBit(square);
+                    break;
+                case SimplePieceType::KING:
+                    m_kings[static_cast<int>(oldPiece.color())].clearBit(square);
+                    break;
+                default:
+                    break;
+            }
+            m_occupancy[static_cast<int>(oldPiece.color())].clearBit(square);
         }
-        if(piece != PieceType::NO_PIECE) {
-            int newIndex = static_cast<int>(piece) - 1;
-            m_bitboards[newIndex].setBit(square);
+        if(!piece.isEmpty()) {
+            switch (piece.type()) {
+                case SimplePieceType::PAWN:
+                    m_pawns[static_cast<int>(piece.color())].setBit(square);
+                    break;
+                case SimplePieceType::KNIGHT:
+                    m_knights[static_cast<int>(piece.color())].setBit(square);
+                    break;
+                case SimplePieceType::BISHOP:
+                    m_bishops[static_cast<int>(piece.color())].setBit(square);
+                    break;
+                case SimplePieceType::ROOK:
+                    m_rooks[static_cast<int>(piece.color())].setBit(square);
+                    break;
+                case SimplePieceType::QUEEN:
+                    m_queens[static_cast<int>(piece.color())].setBit(square);
+                    break;
+                case SimplePieceType::KING:
+                    m_kings[static_cast<int>(piece.color())].setBit(square);
+                    break;
+                default:
+                    break;
+            }
 
-            Color newColor = getPieceColor(piece);
-            m_occupancy[static_cast<int>(newColor)].setBit(square);
+            // Füge zu occupancy hinzu
+            m_occupancy[static_cast<int>(piece.color())].setBit(square);
         }
         m_occupied = m_occupancy[0] | m_occupancy[1];
     }
     void ChessBoard::updateOccupancy() {
-        m_occupancy[0] = Bitboard(0); // w
-        m_occupancy[1] = Bitboard(0); // b
+        // White occupancy
+        m_occupancy[0] = m_pawns[0] | m_knights[0] | m_bishops[0] |
+                         m_rooks[0] | m_queens[0] | m_kings[0];
 
-        for(int i = 0; i < 6; i++) {
-            m_occupancy[0] = m_occupancy[0] | m_bitboards[i];     // w
-            m_occupancy[1] = m_occupancy[1] | m_bitboards[i + 6]; // b
-        }
+        // Black occupancy
+        m_occupancy[1] = m_pawns[1] | m_knights[1] | m_bishops[1] |
+                         m_rooks[1] | m_queens[1] | m_kings[1];
 
         m_occupied = m_occupancy[0] | m_occupancy[1];
     }
