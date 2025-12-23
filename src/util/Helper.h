@@ -8,6 +8,8 @@
 #include <iostream>
 #include <ostream>
 
+#include "VectorUtil.h"
+
 #endif //SCHACHENGINE_HELPER_H
 #pragma once
 
@@ -98,6 +100,27 @@ namespace Chess {
         int file = str[0] - 'a';
         int rank = str[1] - '1';
         return static_cast<Square>(rank * 8 + file);
+    }
+
+    // BOard coord helper
+    inline int XYtoBoardIndex(int x, int y) {
+        // es wird naive angenommen dass x,y stimmt
+        // vllt noch checks aber ich denke die fehler sind einfacher zu beheben,
+        // wenn man sie in der funktion die diese hier aufruft überprüft da richtige dateiangabe gegeben ist
+        return x * 8 + y;
+    }
+    inline int uiToBoardIndex(int uiX, int uiY) {
+        // benötigt schon den UI-boardindex
+        int boardY = 7 - uiY;
+        return boardY * 8 + uiX;
+    }
+
+    inline Engine::vec2 boardIndexToUI(int boardIndex) {
+        // gibt nur den UI-boardindex zurück
+        int boardX = boardIndex % 8;
+        int boardY = boardIndex / 8;
+        int uiY = 7 - boardY;
+        return Engine::vec2{static_cast<float>(boardX),static_cast<float>(uiY)};
     }
     // // STRING-PIECE
     // inline std::string pieceToChar(PieceType piece) {

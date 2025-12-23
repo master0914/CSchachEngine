@@ -30,6 +30,10 @@ add_executable(SchachEngine
         src/core/UIManager.cpp
         src/core/Piece.cpp
         src/core/Piece.h
+        src/util/Logger.h
+        src/core/MoveGenerator.cpp
+        src/core/MoveGenerator.h
+        src/core/Movelist.h
 )
 
 

@@ -23,17 +23,17 @@ namespace Chess {
         uint8_t flags = static_cast<uint8_t>((m_data & FLAGS_MASK) >> FLAGS_SHIFT);
 
         switch (flags) {
-            case Flag::PROMO_Q:
-            case Flag::CAPTURE_PROMO_Q:
+            case PROMO_Q:
+            case CAPTURE_PROMO_Q:
                 return SimplePieceType::QUEEN;
-            case Flag::PROMO_R:
-            case Flag::CAPTURE_PROMO_R:
+            case PROMO_R:
+            case CAPTURE_PROMO_R:
                 return SimplePieceType::ROOK;
-            case Flag::PROMO_B:
-            case Flag::CAPTURE_PROMO_B:
+            case PROMO_B:
+            case CAPTURE_PROMO_B:
                 return SimplePieceType::BISHOP;
-            case Flag::PROMO_N:
-            case Flag::CAPTURE_PROMO_N:
+            case PROMO_N:
+            case CAPTURE_PROMO_N:
                 return SimplePieceType::KNIGHT;
             default:
                 return SimplePieceType::NONE;
@@ -44,13 +44,32 @@ namespace Chess {
     }
 
     // Flags Check
-    bool Move::isCapture() const{}
-    bool Move::isPromotion() const{}
-    bool Move::isEnPassant() const{}
-    bool Move::isCastle() const{}
-    bool Move::isDoublePawnPush() const{}
+    bool Move::isCapture() const{
+        uint8_t f = flags();
+        return f == CAPTURE ||
+               f == CAPTURE_PROMO_Q || f == CAPTURE_PROMO_R ||
+               f == CAPTURE_PROMO_B || f == CAPTURE_PROMO_N ||
+               f == EN_PASSANT;
+    }
+    bool Move::isPromotion() const{
+        uint8_t f = flags();
+        // promotion flags: 0x2-0x9
+        return f >= PROMO_Q && f <= CAPTURE_PROMO_N;
+    }
+    bool Move::isEnPassant() const{
+        return flags() == EN_PASSANT;
+    }
+    bool Move::isCastle() const{
+        uint8_t f = flags();
+        return f == CASTEL_KINGSIDE || f == CASTLE_QUEENSID;
+    }
+    bool Move::isDoublePawnPush() const{
+        return flags() == DOUBLE_PAWN_PUSH;
+    }
 
     // Vergleichsoperatoren für Sorting   (prb redundant)
     bool Move::operator<(const Move& other) const{}
     bool Move::operator==(const Move& other) const{}
+
+    bool Move::isValid() const { return m_data != 0; }
 }

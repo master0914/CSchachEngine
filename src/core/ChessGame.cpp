@@ -9,7 +9,7 @@ namespace Chess {
         m_board.makeMove(move);
     }
 
-    void ChessGame::handleClickOnSquare(int square) {
+    void ChessGame::handleLeftClickOnSquare(int square) {
 
         if (m_selectedSquare == -1) {
             if (getPieceAt(square).isEmpty()) return;
@@ -25,6 +25,10 @@ namespace Chess {
             }
             m_selectedSquare = -1;
         }
+    }
+
+    void ChessGame::handleRightClickOnSquare() {
+        m_selectedSquare = -1;
     }
 
     bool ChessGame::isMoveLegal(Move &move) {

@@ -1,8 +1,10 @@
 
+#include <assert.h>
+
 #include "GameContainer.h"
 #include "core/ChessBoard.h"
 #include "ChessApp.h"
-
+#include "util/Logger.h"
 
 
 int main() {
