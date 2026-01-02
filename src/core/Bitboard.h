@@ -24,12 +24,32 @@ namespace Chess {
         Bitboard operator|(const Bitboard& other) const;
         Bitboard operator^(const Bitboard& other) const;
         Bitboard operator~() const;
+        Bitboard operator&(const uint64_t other) const;
+        Bitboard operator|(const uint64_t other) const;
+        Bitboard operator^(const uint64_t other) const;
+        Bitboard& operator&=(const Bitboard& other);
+
+        Bitboard &operator|=(const Bitboard &other);
+
+        Bitboard &operator^=(const Bitboard &other);
+
+        Bitboard &operator&=(uint64_t other);
+
+        Bitboard &operator|=(const uint64_t other);
+
+        Bitboard &operator^=(const uint64_t other);
+
+        Bitboard &operator<<=(int shift);
+
+        Bitboard &operator>>=(int shift);
 
         bool isEmpty() const;
         int popCount() const;  // wie biele bits gesetzt sind
+        int popLsb() ;
         int lsb() const;       // lowest set bit
         int hsb() const;       // highest set bit
         void debugPrint() const;
+        uint64_t getValue() const;
     private:
         uint64_t m_value;
     };

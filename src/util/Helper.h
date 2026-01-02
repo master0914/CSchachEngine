@@ -103,11 +103,14 @@ namespace Chess {
     }
 
     // BOard coord helper
-    inline int XYtoBoardIndex(int x, int y) {
-        // es wird naive angenommen dass x,y stimmt
-        // vllt noch checks aber ich denke die fehler sind einfacher zu beheben,
-        // wenn man sie in der funktion die diese hier aufruft überprüft da richtige dateiangabe gegeben ist
-        return x * 8 + y;
+    // inline int XYtoBoardIndex(int x, int y) {
+    //     // es wird naive angenommen dass x,y stimmt
+    //     // vllt noch checks aber ich denke die fehler sind einfacher zu beheben,
+    //     // wenn man sie in der funktion die diese hier aufruft überprüft da richtige dateiangabe gegeben ist
+    //     return x * 8 + y;
+    // }
+    inline int makeSquare(int rank, int file) {
+        return rank * 8 + file;
     }
     inline int uiToBoardIndex(int uiX, int uiY) {
         // benötigt schon den UI-boardindex
@@ -122,6 +125,10 @@ namespace Chess {
         int uiY = 7 - boardY;
         return Engine::vec2{static_cast<float>(boardX),static_cast<float>(uiY)};
     }
+    inline int rankOf(int sq) { return sq / 8; }
+    inline int fileOf(int sq) { return sq % 8; }
+    inline Square rankOf(Square sq) { return static_cast<Square>(sq / 8); }
+    inline Square fileOf(Square sq) { return static_cast<Square>(sq % 8); }
     // // STRING-PIECE
     // inline std::string pieceToChar(PieceType piece) {
     //     switch (piece) {

@@ -58,9 +58,9 @@ namespace Chess {
         bool operator<(const Move& other) const;
         bool operator==(const Move& other) const;
 
-        std::ostream& operator<<(std::ostream& os) const {
-            return os << "MOVE: (" << fromSquare() << ", " << toSquare() << ")" << static_cast<int>(flags());
-        }
+        // std::ostream& operator<<(std::ostream& os) const {
+        //     return os << "MOVE: (" << fromSquare() << ", " << toSquare() << ")" << static_cast<int>(flags());
+        // }
 
 
     private:
@@ -113,6 +113,11 @@ namespace Chess {
             }
         }
     };
+    inline std::ostream& operator<<(std::ostream& os, const Move& move) {
+        return os << "MOVE: (" << move.fromSquare() << ", "
+                  << move.toSquare() << ") "
+                  << static_cast<int>(move.flags());
+    }
 }
 
 

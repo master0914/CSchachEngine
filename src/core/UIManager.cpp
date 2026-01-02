@@ -22,27 +22,28 @@ namespace Chess {
         mouseScreenPos.y < m_boardOffsetY + 512;
 
 
-        if (isMouseOverBoard) {
-            if (m_context.input->isMouseButtonJustPressed(Engine::KeyCode::MOUSE_LEFT)) {
-                int boardPosX = static_cast<int>((mouseScreenPos.x - m_boardOffsetX)/64);
-                int boardPosY = static_cast<int>((mouseScreenPos.y - m_boardOffsetY)/64);
+        if (!isMouseOverBoard) {return;}
+        if (m_context.input->isMouseButtonJustPressed(Engine::KeyCode::MOUSE_LEFT)) {
+            int boardPosX = static_cast<int>((mouseScreenPos.x - m_boardOffsetX)/64);
+            int boardPosY = static_cast<int>((mouseScreenPos.y - m_boardOffsetY)/64);
 
-                if (boardPosX < 0 || boardPosX >= 8 || boardPosY < 0 || boardPosY >= 8) {
-                    LOG_ERROR("OH OH! Ein klick wurde außerhalb des boards gemacht????????");
-                    return; // sollte nie passieren
-                }
-                // boardPosY wird für das angezeigte board berechnet muss noch gespiegelt werden
-                // int invertedBoardPosY = 7 - boardPosY;
-                // int boardIndex = invertedBoardPosY * 8 + boardPosX;
-                int boardIndex = uiToBoardIndex(boardPosX, boardPosY);
-                m_game.handleLeftClickOnSquare(boardIndex);
+            if (boardPosX < 0 || boardPosX >= 8 || boardPosY < 0 || boardPosY >= 8) {
+                LOG_ERROR("OH OH! Ein klick wurde außerhalb des boards gemacht????????");
+                return; // sollte nie passieren
             }
+            // boardPosY wird für das angezeigte board berechnet muss noch gespiegelt werden
+            // int invertedBoardPosY = 7 - boardPosY;
+            // int boardIndex = invertedBoardPosY * 8 + boardPosX;
+            int boardIndex = uiToBoardIndex(boardPosX, boardPosY);
+            m_game.handleLeftClickOnSquare(boardIndex);
         }
+
     }
 
     void UIManager::render() const {
         m_renderer.beginFrame();
         renderBackground();
+        renderMoves();
         renderBoard();
         renderHeldPiece();
         m_renderer.present();
@@ -63,7 +64,7 @@ namespace Chess {
     void UIManager::renderBoard() const {
         for (int rank = 0; rank < 8; rank++) {
             for (int file = 0; file < 8; file++) {
-                if (XYtoBoardIndex(rank,file) == m_game.getSelectedSquare()) {
+                if (makeSquare(rank,file) == m_game.getSelectedSquare()) {
                     continue;
                 }
                 int screenY = 7 - rank;
@@ -71,7 +72,7 @@ namespace Chess {
                 int tilePosX = m_boardOffsetX + (file * 64) + m_pieceOffsetXnY;
                 int tilePosY = m_boardOffsetY + (screenY * 64) + m_pieceOffsetXnY;
 
-                Square square = static_cast<Square>(XYtoBoardIndex(rank, file));
+                Square square = static_cast<Square>(makeSquare(rank, file));
 
                 Piece piece = m_game.getBoard().getPieceAt(square);
 
@@ -97,6 +98,33 @@ namespace Chess {
 
         m_renderer.drawImage(m_imgIDs.at(textureIndex),
                              x, y);
+    }
+
+    void UIManager::renderMoves() const {
+        Engine::vec2 mouseScreenPos = m_context.input->getMousePosition();
+        const bool isMouseOverBoard =
+        mouseScreenPos.x >= m_boardOffsetX &&
+        mouseScreenPos.x < m_boardOffsetX + 512 &&
+        mouseScreenPos.y >= m_boardOffsetY &&
+        mouseScreenPos.y < m_boardOffsetY + 512;
+        if (!isMouseOverBoard) {return;}
+        int boardPosX = static_cast<int>((mouseScreenPos.x - m_boardOffsetX)/64);
+        int boardPosY = static_cast<int>((mouseScreenPos.y - m_boardOffsetY)/64);
+        int boardIndex = uiToBoardIndex(boardPosX, boardPosY);
+        renderSelectedSquare(static_cast<Square>(boardIndex));
+    }
+
+    void UIManager::renderSelectedSquare(Square square) const {
+        int file = fileOf(square);
+        int rank = rankOf(square);
+        int screenY = 7 - rank;
+
+        int x = m_boardOffsetX + (file * 64);
+        int y = m_boardOffsetY + (screenY * 64);
+
+
+        m_context.renderer2D->fillRectangle(x,y, 64, 64,
+            0xffffff00);
     }
 
     void UIManager::loadImages() {

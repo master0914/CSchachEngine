@@ -30,6 +30,7 @@ namespace Chess {
         // getter
         Piece getPieceAt(Square square) const;
         Bitboard getAttackers(Square square);
+        Color getSideToMove() const;
         // FEN helper
         std::string toFEN();
         void fromFEN(const std::string& fen);
@@ -40,7 +41,10 @@ namespace Chess {
         bool isDraw() const;
 
         Bitboard getBitboard(Piece pieceType) const;
+        Bitboard getBitboard(SimplePieceType piece, Color color) const;
+
         Bitboard getOccupied() const;
+        Bitboard getOccupancy(Color color) const;
     private:
         // TODO: Zobrist Hashing
 

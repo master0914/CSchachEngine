@@ -16,11 +16,16 @@ namespace Chess {
                                                     m_height(context.window->getm_Height()), m_game(game) {
         };
         void update() const;
+
         void render() const;
         void renderBackground() const;
         void renderBoard() const;
         void renderHeldPiece() const;
         void renderPiece(Piece piece, int x, int y) const;
+        void renderMoves() const;
+
+        void renderSelectedSquare(Square square) const;
+
         void loadImages();
     private:
         Engine::EngineContext& m_context;

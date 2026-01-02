@@ -32,8 +32,13 @@ namespace Chess {
     }
 
     bool ChessGame::isMoveLegal(Move &move) {
-        // TODO: ofc noch richtig prüfen
-        return true;
+        // @TODO schnellere verarbeitung mit hashing
+        for (size_t i = 0; i < m_legalMoves.size(); i++) {
+            if (m_legalMoves[i] == move) {
+                return true;
+            }
+        }
+        return false;
     }
 
     Piece ChessGame::getPieceAt(int square) {
@@ -41,7 +46,8 @@ namespace Chess {
     }
 
     void ChessGame::updateLegalMoves() {
-        // m_legalMoves = generateLegalMoves(m_board, m_currentPlayer);
+        m_legalMoves.clear();
+        m_moveGenerator.generateLegalMoves(m_board,m_legalMoves, m_board.getSideToMove());
     }
 
     bool ChessGame::isValidSelection(int square) {

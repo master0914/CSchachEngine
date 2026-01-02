@@ -42,6 +42,11 @@ namespace Chess {
         void pop() {if (m_count > 0) m_count--;}
 
         void sort(){} // evtl nützlich TODO
+        void debugPrint() {
+            for (size_t i = 0; i < m_count; i++) {
+                std::cout << m_moves[i] << std::endl;
+            }
+        }
     private:
         Move m_moves[MAX_MOVES];
         size_t m_count;

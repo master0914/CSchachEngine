@@ -6,7 +6,7 @@
 
 namespace Chess {
     Bitboard::Bitboard() {
-        m_value = 0;
+        m_value = 0ULL;
     }
 
     Bitboard::Bitboard(const uint64_t bits) {
@@ -54,6 +54,49 @@ namespace Chess {
     Bitboard Bitboard::operator~() const {
         return Bitboard{~m_value};
     }
+    Bitboard Bitboard::operator&(const uint64_t other) const {
+        return Bitboard{m_value & other};
+    }
+
+    Bitboard Bitboard::operator|(const uint64_t other) const {
+        return Bitboard{m_value | other};
+    }
+
+    Bitboard Bitboard::operator^(const uint64_t other) const {
+        return Bitboard{m_value ^ other};
+    }
+    Bitboard& Bitboard::operator&=(const Bitboard &other) {
+        m_value &= other.m_value;
+        return *this;
+    }
+    Bitboard& Bitboard::operator|=(const Bitboard &other) {
+        m_value |= other.m_value;
+        return *this;
+    }
+    Bitboard& Bitboard::operator^=(const Bitboard &other) {
+        m_value ^= other.m_value;
+        return *this;
+    }
+    Bitboard& Bitboard::operator&=(const uint64_t other) {
+        m_value &= other;
+        return *this;
+    }
+    Bitboard& Bitboard::operator|=(const uint64_t other) {
+        m_value |= other;
+        return *this;
+    }
+    Bitboard& Bitboard::operator^=(const uint64_t other) {
+        m_value ^= other;
+        return *this;
+    }
+    Bitboard& Bitboard::operator<<=(int shift) {
+        m_value <<= shift;
+        return *this;
+    }
+    Bitboard& Bitboard::operator>>=(int shift) {
+        m_value >>= shift;
+        return *this;
+    }
 
     bool Bitboard::isEmpty() const {
         return m_value == 0;
@@ -62,6 +105,13 @@ namespace Chess {
     // danke an deepseek für die builtin methoden
     int Bitboard::popCount() const {
         return __builtin_popcount(m_value);
+    }
+    int Bitboard::popLsb() {
+        // Zuerst den Index des LSB ermitteln
+        int index = __builtin_ctzll(m_value);
+        // Dann das Bit löschen (setze niedrigstes gesetztes Bit auf 0)
+        m_value &= m_value - 1;
+        return index;
     }
 
     int Bitboard::lsb() const {
@@ -82,5 +132,9 @@ namespace Chess {
             }
             std::cout << '\n';
         }
+    }
+
+    uint64_t Bitboard::getValue() const {
+        return m_value;
     }
 }

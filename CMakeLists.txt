@@ -34,6 +34,7 @@ add_executable(SchachEngine
         src/core/MoveGenerator.cpp
         src/core/MoveGenerator.h
         src/core/Movelist.h
+        src/tester.h
 )
 
 

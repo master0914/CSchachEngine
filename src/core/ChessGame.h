@@ -7,6 +7,8 @@
 
 #pragma once
 #include "ChessBoard.h"
+#include "MoveGenerator.h"
+#include "Movelist.h"
 
 namespace Chess {
     class ChessGame {
@@ -28,6 +30,8 @@ namespace Chess {
         ChessBoard m_board;
         // in echter boardposition angegeben
         int m_selectedSquare = -1;
+        Movelist m_legalMoves;
+        MoveGenerator m_moveGenerator;
 
         void updateLegalMoves();
         bool isValidSelection(int square);

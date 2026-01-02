@@ -5,6 +5,7 @@
 #include "core/ChessBoard.h"
 #include "ChessApp.h"
 #include "util/Logger.h"
+#include "tester.h"
 
 
 int main() {
@@ -12,10 +13,11 @@ int main() {
     Engine::GameContainer gc{512+16,512+40,"Schach"};
     gc.createGame<Chess::ChessApp>();
     gc.run();
-    // Chess::ChessGame game{};
-    // game.getBoard().getOccupied().debugPrint();
+    // Chess::testMoveGenerator();
     return 0;
 }
+
+
 
 
 

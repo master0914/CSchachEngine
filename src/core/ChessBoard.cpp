@@ -49,6 +49,10 @@ namespace Chess {
     Bitboard ChessBoard::getAttackers(Square) {
     }
 
+    Color ChessBoard::getSideToMove() const {
+        return m_sideToMove;
+    }
+
     bool ChessBoard::isCheck() const {
     }
 
@@ -85,8 +89,34 @@ namespace Chess {
         }
     }
 
+    Bitboard ChessBoard::getBitboard(SimplePieceType piece, Color color) const {
+        if (piece == SimplePieceType::NONE) {
+            return Bitboard(0);
+        }
+        int colorIndex = static_cast<int>(color);
+        switch (piece) {
+            case SimplePieceType::PAWN:
+                return m_pawns[colorIndex];
+            case SimplePieceType::KNIGHT:
+                return m_knights[colorIndex];
+            case SimplePieceType::BISHOP:
+                return m_bishops[colorIndex];
+            case SimplePieceType::ROOK:
+                return m_rooks[colorIndex];
+            case SimplePieceType::QUEEN:
+                return m_queens[colorIndex];
+            case SimplePieceType::KING:
+                return m_kings[colorIndex];
+            default:
+                return Bitboard(0);
+        }
+    }
+
     Bitboard ChessBoard::getOccupied() const {
         return m_occupied;
+    }
+    Bitboard ChessBoard::getOccupancy(Color color) const {
+        return m_occupancy[static_cast<int>(color)];
     }
 
     void ChessBoard::clear() {
