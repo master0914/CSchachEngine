@@ -26,7 +26,7 @@ namespace Chess {
                                         Square square,
                                         Color sideToMove);
     private:
-        // bauern
+        // bauern-------------------------------------------
         void generatePawnMoves(const ChessBoard& board,
                                   Movelist& moveList,
                                   Color color);
@@ -46,29 +46,33 @@ namespace Chess {
         void generateEnPassantMoves(const ChessBoard& board,
                                        Movelist& moveList,
                                        Color color);
-        // springer
+        // springer-------------------------------------------
         void generateKnightMoves(const ChessBoard& board,
                                     Movelist& moveList,
                                     Color color);
-        // läufer
+        // läufer-------------------------------------------
         void generateBishopMoves(const ChessBoard& board,
                                         Movelist& moveList,
                                         Color color);
-        // türme
+        // türme-------------------------------------------
         void generateRookMoves(const ChessBoard& board,
                                       Movelist& moveList,
                                       Color color);
 
-        // damen
+        // damen-------------------------------------------
         void generateQueenMoves(const ChessBoard& board,
                                        Movelist& moveList,
                                        Color color);
 
-        // könige
+        // könige-------------------------------------------
         void generateKingMoves(const ChessBoard& board,
                                       Movelist& moveList,
                                       Color color);
-        // rochade
+
+        void generateNormalKingMoves(const ChessBoard& board,
+                                      Movelist& moveList,
+                                      Color color);
+
         void generateCastlingMoves(const ChessBoard& board,
                                       Movelist& moveList,
                                       Color color);
@@ -84,16 +88,7 @@ namespace Chess {
         bool canCastleKingside(const ChessBoard& board, Color color);
         bool canCastleQueenside(const ChessBoard& board, Color color);
 
-        Color oppositeColor(Color color) {
-            return (color == Color::WHITE) ? Color::BLACK : Color::WHITE;
-        }
-        // Direction lookup-----------------------------
-        // r is rank
-        // f is file
-
-
-        // Attack Table---------------------------------
-
+        void addMove(Movelist& moveList, const Move& move);
 
     };
 }

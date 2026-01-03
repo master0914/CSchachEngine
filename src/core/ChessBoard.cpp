@@ -8,9 +8,9 @@
 
 namespace Chess {
     ChessBoard::ChessBoard() {
-        // fromFEN(START_FEN);
+        fromFEN(START_FEN);
         // TEST FENs
-        fromFEN("8/8/8/8/2N2p1P/1p1Np1P1/PPPPPPPP/8 w KQkq - 0 1");
+        // fromFEN("8/8/8/8/2N2p1P/1p1Np1P1/PPPPPPPP/8 w KQkq - 0 1");
     }
 
     void ChessBoard::makeMove(Move &move) {
@@ -20,6 +20,8 @@ namespace Chess {
 
         setPieceAt(from, Piece{});
         setPieceAt(to, mover);
+
+        switchColor();
     }
 
     void ChessBoard::undoMove(Move &move) {
@@ -212,6 +214,9 @@ namespace Chess {
                          m_rooks[1] | m_queens[1] | m_kings[1];
 
         m_occupied = m_occupancy[0] | m_occupancy[1];
+    }
+    void ChessBoard::switchColor() {
+        m_sideToMove = getOtherColor(m_sideToMove);
     }
 
     std::string ChessBoard::toFEN() {

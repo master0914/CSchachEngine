@@ -11,6 +11,10 @@
 
 namespace Chess {
     namespace Attacks {
+        // Direction lookup-----------------------------
+        // r is rank
+        // f is file
+
         // knight
         inline int knightDr[8] = {-2, -1, 1, 2, 2, 1, -1, -2};
         inline int knightDf[8] = {1, 2, 2, 1, -1, -2, -2, -1};
@@ -26,6 +30,7 @@ namespace Chess {
         inline int bishopDr[4] = { 1, 1, -1, -1 };
         inline int bishopDf[4] = { 1, -1, 1, -1 };
 
+        // Attack Table---------------------------------
         // attack boards
         inline Bitboard knightAttacks[64];
         inline Bitboard kingAttacks[64];
@@ -35,7 +40,7 @@ namespace Chess {
         inline Bitboard rookRays[64];
         inline Bitboard bishopRays[64];
 
-        // inits
+        // inits-----------------------------------------
         inline void initKnightAttacks() {
             for (int sq = 0; sq < 64; ++sq) {
                 Bitboard attack = Bitboard{};
@@ -110,7 +115,7 @@ namespace Chess {
         inline void initPawnPushes() {
             for (int sq = 0; sq < 64; ++sq) {
                 int r = rankOf(sq);
-                int f = fileOf(sq);
+                // int f = fileOf(sq);
 
                 // WHITE pawns (move north)
                 if (r < 7) {  // Not on 8th rank
@@ -131,7 +136,7 @@ namespace Chess {
         inline void initPawnDoublePushes() {
             for (int sq = 0; sq < 64; ++sq) {
                 int r = rankOf(sq);
-                int f = fileOf(sq);
+                // int f = fileOf(sq);
 
                 // WHITE pawns (from 2nd rank to 4th rank)
                 if (r == 1) {  // On 2nd rank

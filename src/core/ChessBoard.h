@@ -52,6 +52,7 @@ namespace Chess {
         void reset();
         void setPieceAt(Square square, Piece piece);
         void updateOccupancy();
+        void switchColor();
 
         Bitboard m_pawns[2];
         Bitboard m_knights[2];

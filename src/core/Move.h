@@ -120,10 +120,11 @@ namespace Chess {
             }
         }
     };
+
     inline std::ostream& operator<<(std::ostream& os, const Move& move) {
         return os << "MOVE: (" << move.fromSquare() << ", "
                   << move.toSquare() << ") "
-                  << static_cast<int>(move.flags());
+                  << move.flags();
     }
 }
 

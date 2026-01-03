@@ -103,6 +103,7 @@ namespace Chess {
     }
 
     void UIManager::renderMoves() const {
+
         Engine::vec2 mouseScreenPos = m_context.input->getMousePosition();
         const bool isMouseOverBoard =
         mouseScreenPos.x >= m_boardOffsetX &&
@@ -113,13 +114,16 @@ namespace Chess {
         int boardPosX = static_cast<int>((mouseScreenPos.x - m_boardOffsetX)/64);
         int boardPosY = static_cast<int>((mouseScreenPos.y - m_boardOffsetY)/64);
         int hoveredSquare = uiToBoardIndex(boardPosX, boardPosY);
-        renderSelectedSquare(static_cast<Square>(hoveredSquare), 0xffffd580);
+        if (m_game.getSelectedSquare() != -1) {
+            hoveredSquare = m_game.getSelectedSquare();
+        }
+        renderSquare(static_cast<Square>(hoveredSquare), 0xffffd580);
         renderMoveSquares(static_cast<Square>(hoveredSquare));
     }
 
-    void UIManager::renderSelectedSquare(Square square, uint32_t color) const {
-        int file = toInt(fileOf(square));
-        int rank = toInt(rankOf(square));
+    void UIManager::renderSquare(Square square, uint32_t color) const {
+        int file = fileOf(square);
+        int rank = rankOf(square);
         int screenY = 7 - rank;
 
         int x = m_boardOffsetX + (file * 64);
@@ -134,7 +138,7 @@ namespace Chess {
         Movelist legalMoves = m_game.getMoveList();
         for (int i = 0; i < legalMoves.size(); i++) {
             if (legalMoves[i].fromSquare() == toInt(square)) {
-                renderSelectedSquare(static_cast<Square>(legalMoves[i].toSquare()),0xff2400);
+                renderSquare(static_cast<Square>(legalMoves[i].toSquare()),0xff2400);
             }
         }
     }

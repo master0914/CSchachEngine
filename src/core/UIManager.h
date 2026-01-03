@@ -23,16 +23,13 @@ namespace Chess {
         void renderHeldPiece() const;
         void renderPiece(Piece piece, int x, int y) const;
         void renderMoves() const;
-        void renderSelectedSquare(Square square, uint32_t color) const;
+        void renderSquare(Square square, uint32_t color) const;
         void renderMoveSquares(Square square) const;
         void loadImages();
     private:
         Engine::EngineContext& m_context;
         Engine::Renderer_2D& m_renderer;
         ChessGame& m_game;
-        // Inputstuff -------------------
-        int m_selectedSquare;
-        bool m_isPieceSelected;
         // Renderstuff -----------------
         // PieceType - 1 = imageID
         std::vector<int> m_imgIDs;

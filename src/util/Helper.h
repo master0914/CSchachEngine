@@ -18,25 +18,14 @@ namespace Chess {
         WHITE = false,
         BLACK = true
     };
+    inline Color getOtherColor(Color color) {
+        return static_cast<Color>(!static_cast<bool>(color));
+    }
     template<typename E>
     constexpr auto toInt(E e) noexcept {
         return static_cast<std::underlying_type_t<E>>(e);
     }
-    // enum class PieceType : uint8_t {
-    //     NO_PIECE = 0,
-    //     WHITE_PAWN = 1,   // 0001
-    //     WHITE_KNIGHT = 2, // 0010
-    //     WHITE_BISHOP = 3, // 0011
-    //     WHITE_ROOK = 4,   // 0100
-    //     WHITE_QUEEN = 5,  // 0101
-    //     WHITE_KING = 6,   // 0110
-    //     BLACK_PAWN = 7,   // 0111
-    //     BLACK_KNIGHT = 8, // 1000
-    //     BLACK_BISHOP = 9, // 1001
-    //     BLACK_ROOK = 10,  // 1010
-    //     BLACK_QUEEN = 11, // 1011
-    //     BLACK_KING = 12   // 1100
-    // };
+
     enum class SimplePieceType : uint8_t {
         NONE = 0,
         PAWN = 1,
@@ -63,6 +52,49 @@ namespace Chess {
         DOUBLE_PAWN_PUSH = 0xD  // 1101
         // 0xE und 0xF können noch für anderen shit verwendet werden
     };
+
+    inline std::ostream& operator<<(std::ostream& os,Flag flag) {
+        switch (flag) {
+            case Flag::NORMAL:
+                return os << "Normal";
+            case Flag::CAPTURE:
+                return os << "Capture";
+            case Flag::PROMO_Q:
+                return os << "PromoQ";
+            case Flag::CAPTURE_PROMO_Q:
+                return os << "CapturePromoQ";
+            case Flag::PROMO_R:
+                return os << "PromoR";
+            case Flag::CAPTURE_PROMO_R:
+                return os << "CapturePromoR";
+            case Flag::PROMO_B:
+                return os << "PromoB";
+            case Flag::CAPTURE_PROMO_B:
+                return os << "CapturePromoB";
+            case Flag::PROMO_N:
+                return os << "PromoN";
+            case Flag::CAPTURE_PROMO_N:
+                return os << "CapturePromoN";
+            case Flag::EN_PASSANT:
+                return os << "EnPassant";
+            case Flag::CASTEL_KINGSIDE:
+                return os << "CastleKingSide";
+            case Flag::CASTLE_QUEENSID:
+                return os << "CastleQueensSide";
+            case Flag::DOUBLE_PAWN_PUSH:
+                return os << "DoublePawnPush";
+            default:
+                return os << "ERROR!!! FLAG NOT FOUND!!!";
+        }
+    }
+
+    enum CastlingRights : uint8_t {
+        NO_CASTLING = 0,
+        WHITE_KINGSIDE  = 1 << 0,  // 0001:  weiß kurze Rochade
+        WHITE_QUEENSIDE = 1 << 1,  // 0010: weiß lange Rochade
+        BLACK_KINGSIDE  = 1 << 2,  // 0100: schwarz kurze Rochade
+        BLACK_QUEENSIDE = 1 << 3   // 1000: schwarz lange Rochade
+    };
     enum class Square : uint8_t {
         A1 = 0,  B1 = 1,  C1 = 2,  D1 = 3,  E1 = 4,  F1 = 5,  G1 = 6,  H1 = 7,
         A2 = 8,  B2 = 9,  C2 = 10, D2 = 11, E2 = 12, F2 = 13, G2 = 14, H2 = 15,
@@ -74,14 +106,6 @@ namespace Chess {
         A8 = 56, B8 = 57, C8 = 58, D8 = 59, E8 = 60, F8 = 61, G8 = 62, H8 = 63,
         INVALID_SQUARE = 111
     };
-    enum CastlingRights : uint8_t {
-        NO_CASTLING = 0,
-        WHITE_KINGSIDE  = 1 << 0,  // 0001:  weiß kurze Rochade
-        WHITE_QUEENSIDE = 1 << 1,  // 0010: weiß lange Rochade
-        BLACK_KINGSIDE  = 1 << 2,  // 0100: schwarz kurze Rochade
-        BLACK_QUEENSIDE = 1 << 3   // 1000: schwarz lange Rochade
-    };
-
     inline const std::string names[64] = {
         "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
         "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
@@ -92,8 +116,6 @@ namespace Chess {
         "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
         "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
     };
-    inline std::string START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-
     // STRING-SQUARE
     inline std::string squareToString(Square const sq) {
         return names[toInt(sq)];
@@ -105,6 +127,10 @@ namespace Chess {
         int rank = str[1] - '1';
         return static_cast<Square>(rank * 8 + file);
     }
+
+    inline std::string START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+
 
 
 
@@ -139,8 +165,8 @@ namespace Chess {
     }
     inline int rankOf(int sq) { return sq / 8; }
     inline int fileOf(int sq) { return sq % 8; }
-    inline Square rankOf(Square sq) { return static_cast<Square>(toInt(sq) / 8); }
-    inline Square fileOf(Square sq) { return static_cast<Square>(toInt(sq) % 8); }
+    inline int rankOf(Square sq) { return toInt(sq) / 8; }
+    inline int fileOf(Square sq) { return toInt(sq) % 8; }
     // // STRING-PIECE
     // inline std::string pieceToChar(PieceType piece) {
     //     switch (piece) {
@@ -197,4 +223,19 @@ namespace Chess {
     //     if(piece == PieceType::NO_PIECE) {return Color::White; }
     //     return (static_cast<int>(piece) < 6) ? Color::White : Color::Black;
     // }
+    // enum class PieceType : uint8_t {
+    //     NO_PIECE = 0,
+    //     WHITE_PAWN = 1,   // 0001
+    //     WHITE_KNIGHT = 2, // 0010
+    //     WHITE_BISHOP = 3, // 0011
+    //     WHITE_ROOK = 4,   // 0100
+    //     WHITE_QUEEN = 5,  // 0101
+    //     WHITE_KING = 6,   // 0110
+    //     BLACK_PAWN = 7,   // 0111
+    //     BLACK_KNIGHT = 8, // 1000
+    //     BLACK_BISHOP = 9, // 1001
+    //     BLACK_ROOK = 10,  // 1010
+    //     BLACK_QUEEN = 11, // 1011
+    //     BLACK_KING = 12   // 1100
+    // };
 }
