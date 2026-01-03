@@ -7,6 +7,7 @@
 namespace Chess {
     void ChessGame::makeMove(Move& move) {
         m_board.makeMove(move);
+        updateLegalMoves();
     }
 
     void ChessGame::handleLeftClickOnSquare(int square) {
@@ -34,7 +35,9 @@ namespace Chess {
     bool ChessGame::isMoveLegal(Move &move) {
         // @TODO schnellere verarbeitung mit hashing
         for (size_t i = 0; i < m_legalMoves.size(); i++) {
-            if (m_legalMoves[i] == move) {
+            const Move &lm = m_legalMoves[i];
+            if (lm.isSameWithoutFlag(move)) {
+                move.setFlags(lm.promotionPiece(),lm.flags(), lm.isCapture());
                 return true;
             }
         }

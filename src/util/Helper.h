@@ -18,6 +18,10 @@ namespace Chess {
         WHITE = false,
         BLACK = true
     };
+    template<typename E>
+    constexpr auto toInt(E e) noexcept {
+        return static_cast<std::underlying_type_t<E>>(e);
+    }
     // enum class PieceType : uint8_t {
     //     NO_PIECE = 0,
     //     WHITE_PAWN = 1,   // 0001
@@ -42,7 +46,7 @@ namespace Chess {
         QUEEN = 5,
         KING = 6
     };
-    enum Flag:uint8_t {
+    enum class Flag:uint8_t {
         NORMAL = 0x0,           // 0000
         CAPTURE = 0x1,          // 0001
         PROMO_Q = 0x2,          // 0010
@@ -59,7 +63,7 @@ namespace Chess {
         DOUBLE_PAWN_PUSH = 0xD  // 1101
         // 0xE und 0xF können noch für anderen shit verwendet werden
     };
-    enum Square : uint8_t {
+    enum class Square : uint8_t {
         A1 = 0,  B1 = 1,  C1 = 2,  D1 = 3,  E1 = 4,  F1 = 5,  G1 = 6,  H1 = 7,
         A2 = 8,  B2 = 9,  C2 = 10, D2 = 11, E2 = 12, F2 = 13, G2 = 14, H2 = 15,
         A3 = 16, B3 = 17, C3 = 18, D3 = 19, E3 = 20, F3 = 21, G3 = 22, H3 = 23,
@@ -92,15 +96,17 @@ namespace Chess {
 
     // STRING-SQUARE
     inline std::string squareToString(Square const sq) {
-        return names[sq];
+        return names[toInt(sq)];
     }
     inline Square stringToSquare(const std::string& str) {
         // danke deepseek(war zu faul)
-        if(str.length() != 2) return INVALID_SQUARE;
+        if(str.length() != 2) return Square::INVALID_SQUARE;
         int file = str[0] - 'a';
         int rank = str[1] - '1';
         return static_cast<Square>(rank * 8 + file);
     }
+
+
 
     // BOard coord helper
     // inline int XYtoBoardIndex(int x, int y) {
@@ -109,13 +115,19 @@ namespace Chess {
     //     // wenn man sie in der funktion die diese hier aufruft überprüft da richtige dateiangabe gegeben ist
     //     return x * 8 + y;
     // }
-    inline int makeSquare(int rank, int file) {
-        return rank * 8 + file;
+
+    // ja ich weiß es heißt makesquare aber gibt einen int zurück ist praktischer so
+    constexpr int makeSquare(int rank, int file) noexcept{
+        return (rank << 3) | file;
     }
-    inline int uiToBoardIndex(int uiX, int uiY) {
+
+    constexpr int uiToBoardIndex(int uiX, int uiY) noexcept{
         // benötigt schon den UI-boardindex
-        int boardY = 7 - uiY;
-        return boardY * 8 + uiX;
+        // int boardY = 7 - uiY;
+        // return boardY * 8 + uiX;
+
+        // danke an deepseek für opitmierung:
+        return ((7 - uiY) << 3) | uiX;
     }
 
     inline Engine::vec2 boardIndexToUI(int boardIndex) {
@@ -127,8 +139,8 @@ namespace Chess {
     }
     inline int rankOf(int sq) { return sq / 8; }
     inline int fileOf(int sq) { return sq % 8; }
-    inline Square rankOf(Square sq) { return static_cast<Square>(sq / 8); }
-    inline Square fileOf(Square sq) { return static_cast<Square>(sq % 8); }
+    inline Square rankOf(Square sq) { return static_cast<Square>(toInt(sq) / 8); }
+    inline Square fileOf(Square sq) { return static_cast<Square>(toInt(sq) % 8); }
     // // STRING-PIECE
     // inline std::string pieceToChar(PieceType piece) {
     //     switch (piece) {

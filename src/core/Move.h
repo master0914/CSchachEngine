@@ -57,6 +57,13 @@ namespace Chess {
         // Vergleichsoperatoren für Sorting
         bool operator<(const Move& other) const;
         bool operator==(const Move& other) const;
+        bool isSameWithoutFlag(const Move& other) const {
+            return (fromSquare() == other.fromSquare() && toSquare() == other.toSquare());
+        }
+
+        void setFlags(SimplePieceType promotionPiece, Flag flag, bool isCapture) {
+            setComplexFlag(promotionPiece, flag, isCapture);
+        }
 
         // std::ostream& operator<<(std::ostream& os) const {
         //     return os << "MOVE: (" << fromSquare() << ", " << toSquare() << ")" << static_cast<int>(flags());
@@ -80,34 +87,34 @@ namespace Chess {
 
             switch (promotionPiece) {
                 case SimplePieceType::QUEEN:
-                    flag = isCapture ? CAPTURE_PROMO_Q : PROMO_Q;
+                    flag = isCapture ? Flag::CAPTURE_PROMO_Q : Flag::PROMO_Q;
                     break;
                 case SimplePieceType::ROOK:
-                    flag = isCapture ? CAPTURE_PROMO_R : PROMO_R;
+                    flag = isCapture ? Flag::CAPTURE_PROMO_R : Flag::PROMO_R;
                     break;
                 case SimplePieceType::BISHOP:
-                    flag = isCapture ? CAPTURE_PROMO_B : PROMO_B;
+                    flag = isCapture ? Flag::CAPTURE_PROMO_B : Flag::PROMO_B;
                     break;
                 case SimplePieceType::KNIGHT:
-                    flag = isCapture ? CAPTURE_PROMO_N : PROMO_N;
+                    flag = isCapture ? Flag::CAPTURE_PROMO_N : Flag::PROMO_N;
                     break;
                 default:
-                    flag = isCapture ? CAPTURE : NORMAL;
+                    flag = isCapture ? Flag::CAPTURE : Flag::NORMAL;
                     break;
             }
 
             m_data |= (static_cast<uint16_t>(flag) << 12);
         }
         void setComplexFlag(SimplePieceType promotion, Flag flag, bool isCapture) {
-            // Wenn Promotion, überschreibe Flag
+            // Wenn promo -> überschreibe Flag
             if (promotion != SimplePieceType::NONE) {
                 setPromotionFlag(promotion, isCapture);
             }
-            // Wenn keine Promotion, aber Capture mit NORMAL flag
-            else if (isCapture && flag == NORMAL) {
-                m_data |= (static_cast<uint16_t>(CAPTURE) << 12);
+            // Wenn !promo, aber capture mit NORMAL flag
+            else if (isCapture && flag == Flag::NORMAL) {
+                m_data |= (static_cast<uint16_t>(Flag::CAPTURE) << 12);
             }
-            // Ansonsten übernommener Flag (en passant, castle, etc.)
+            // sonst flag übernehmen (en passant, castle, etc.)
             else {
                 m_data |= (static_cast<uint16_t>(flag) << 12);
             }

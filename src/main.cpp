@@ -6,12 +6,15 @@
 #include "ChessApp.h"
 #include "util/Logger.h"
 #include "tester.h"
+#include "core/MoveGeneration/Attacks.h"
 
 
 int main() {
+    Chess::Attacks::init();
     // TODO: Clientsize noch im GC korrigieren
     Engine::GameContainer gc{512+16,512+40,"Schach"};
     gc.createGame<Chess::ChessApp>();
+    gc.setShowFPS(false);
     gc.run();
     // Chess::testMoveGenerator();
     return 0;

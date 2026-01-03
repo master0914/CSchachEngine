@@ -8,7 +8,9 @@
 
 namespace Chess {
     ChessBoard::ChessBoard() {
-        fromFEN(START_FEN);
+        // fromFEN(START_FEN);
+        // TEST FENs
+        fromFEN("8/8/8/8/2N2p1P/1p1Np1P1/PPPPPPPP/8 w KQkq - 0 1");
     }
 
     void ChessBoard::makeMove(Move &move) {
@@ -134,7 +136,7 @@ namespace Chess {
         m_kings[1] = Bitboard{0};
 
         m_occupancy[0] = m_occupancy[1] = m_occupied = Bitboard(0);
-        m_boardState.enPassantSquare = INVALID_SQUARE;
+        m_boardState.enPassantSquare = Square::INVALID_SQUARE;
         m_boardState.castlingRights = static_cast<CastlingRights>(0);
         m_sideToMove = Color::WHITE;
         m_boardState.halfMoveClock = m_boardState.fullMoveNumber = 0;
@@ -253,7 +255,7 @@ namespace Chess {
         fen += castling.empty() ? "- " : castling + " ";
 
         // 4. En passant
-        fen += (m_boardState.enPassantSquare == INVALID_SQUARE) ? "- " : squareToString(m_boardState.enPassantSquare) + " ";
+        fen += (m_boardState.enPassantSquare == Square::INVALID_SQUARE) ? "- " : squareToString(m_boardState.enPassantSquare) + " ";
 
         // 5. Move counters
         fen += std::to_string(m_boardState.halfMoveClock) + " " + std::to_string(m_boardState.fullMoveNumber);
@@ -314,7 +316,7 @@ namespace Chess {
 
         // 4. En passant square
         if(enPassant == "-") {
-            m_boardState.enPassantSquare = INVALID_SQUARE;
+            m_boardState.enPassantSquare = Square::INVALID_SQUARE;
         } else {
             m_boardState.enPassantSquare = stringToSquare(enPassant);
         }

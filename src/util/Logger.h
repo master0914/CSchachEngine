@@ -4,6 +4,7 @@
 
 #ifndef SCHACHENGINE_LOGGER_H
 #define SCHACHENGINE_LOGGER_H
+#include <filesystem>
 
 #endif //SCHACHENGINE_LOGGER_H
 #pragma once
@@ -15,6 +16,14 @@
 #include <string>
 
 namespace Chess {
+    static constexpr const char* RESET = "\033[0m";
+    static constexpr const char* RED = "\033[31m";
+    static constexpr const char* GREEN = "\033[32m";
+    static constexpr const char* YELLOW = "\033[33m";
+    static constexpr const char* BRIGHT_RED = "\033[91m";
+    static constexpr const char* BRIGHT_GREEN = "\033[92m";
+    static constexpr const char* BRIGHT_YELLOW = "\033[93m";
+
     enum class Level {
         Info,
         Warn,
@@ -28,6 +37,21 @@ namespace Chess {
             case Level::Error: return "ERROR";
             default:           return "UNKNOWN";
         }
+    }
+    inline const char* levelToColorCode(Level lvl) {
+        const char* levelColor = "";
+        switch (lvl) {
+            case Level::Info:
+                levelColor = BRIGHT_GREEN;
+                break;
+            case Level::Warn:
+                levelColor = BRIGHT_YELLOW;
+                break;
+            case Level::Error:
+                levelColor = BRIGHT_RED;
+                break;
+        }
+        return levelColor;
     }
 
     inline std::string timestamp() {
@@ -55,11 +79,12 @@ namespace Chess {
                     const std::string& msg,
                     const char* file,
                     int line) {
-
+        std::filesystem::path filepath(file);
+        std::string filename = filepath.filename().string(); // nur Dateiname
         std::cout
             << "[" << timestamp() << "] "
             << "[" << levelToString(lvl) << "] "
-            << "[" << file << ":" << line << "] "
+            << "[" << filename << ":" << line << "] "
             << msg
             << std::endl;
     }

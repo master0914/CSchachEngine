@@ -4,7 +4,7 @@
 
 #ifndef SCHACHENGINE_TESTER_H
 #define SCHACHENGINE_TESTER_H
-#include "core/MoveGenerator.h"
+#include "core/MoveGeneration/MoveGenerator.h"
 
 #endif //SCHACHENGINE_TESTER_H
 

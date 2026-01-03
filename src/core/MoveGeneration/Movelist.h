@@ -7,8 +7,8 @@
 #include <assert.h>
 #include <cstddef>
 
-#include "Move.h"
-#include "../util/Logger.h"
+#include "../Move.h"
+#include "../../util/Logger.h"
 
 namespace Chess {
     class Movelist {

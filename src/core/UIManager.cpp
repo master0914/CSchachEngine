@@ -51,12 +51,14 @@ namespace Chess {
 
     void UIManager::renderBackground() const {
         // m_renderer.fillRectangle(m_boardOffsetX,m_boardOffsetY,m_boardWidth,m_boardHeight,m_colorWhite);
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                int tilePosX = m_boardOffsetX + (row * 64);
-                int tilePosY = m_boardOffsetY + (col * 64);
-                uint32_t color = (((col + row) % 2) == 0) ? m_colorWhite : m_colorBlack;
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                int tilePosX = m_boardOffsetX + (x * 64);
+                int tilePosY = m_boardOffsetY + (y * 64);
+                uint32_t color = (((y + x) % 2) == 0) ? m_colorWhite : m_colorBlack;
                 m_renderer.fillRectangle(tilePosX, tilePosY, m_squareSize,m_squareSize, color);
+                // die indices die hier gerendert werden sind die der engineinternen indizierung
+                m_renderer.drawText(std::to_string(uiToBoardIndex(x,y)),tilePosX,tilePosY,0xffffffff);
             }
         }
     }
@@ -110,13 +112,14 @@ namespace Chess {
         if (!isMouseOverBoard) {return;}
         int boardPosX = static_cast<int>((mouseScreenPos.x - m_boardOffsetX)/64);
         int boardPosY = static_cast<int>((mouseScreenPos.y - m_boardOffsetY)/64);
-        int boardIndex = uiToBoardIndex(boardPosX, boardPosY);
-        renderSelectedSquare(static_cast<Square>(boardIndex));
+        int hoveredSquare = uiToBoardIndex(boardPosX, boardPosY);
+        renderSelectedSquare(static_cast<Square>(hoveredSquare), 0xffffd580);
+        renderMoveSquares(static_cast<Square>(hoveredSquare));
     }
 
-    void UIManager::renderSelectedSquare(Square square) const {
-        int file = fileOf(square);
-        int rank = rankOf(square);
+    void UIManager::renderSelectedSquare(Square square, uint32_t color) const {
+        int file = toInt(fileOf(square));
+        int rank = toInt(rankOf(square));
         int screenY = 7 - rank;
 
         int x = m_boardOffsetX + (file * 64);
@@ -124,7 +127,16 @@ namespace Chess {
 
 
         m_context.renderer2D->fillRectangle(x,y, 64, 64,
-            0xffffff00);
+            color);
+    }
+
+    void UIManager:: renderMoveSquares(Square square) const {
+        Movelist legalMoves = m_game.getMoveList();
+        for (int i = 0; i < legalMoves.size(); i++) {
+            if (legalMoves[i].fromSquare() == toInt(square)) {
+                renderSelectedSquare(static_cast<Square>(legalMoves[i].toSquare()),0xff2400);
+            }
+        }
     }
 
     void UIManager::loadImages() {

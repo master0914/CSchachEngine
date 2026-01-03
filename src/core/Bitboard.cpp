@@ -15,7 +15,7 @@ namespace Chess {
 
     void Bitboard::setBit(const Square square) {
         // setzt den wert bei square immer auf 1
-        m_value |= (1ULL << square);
+        m_value |= (1ULL << toInt(square));
     }
 
     void Bitboard::clearBit(const Square square) {
@@ -24,19 +24,19 @@ namespace Chess {
         // 00100010 &= ~(00000010)  =
         // 00100010 &= 11111101     =
         // 00100000
-        m_value &= ~(1ULL << square);
+        m_value &= ~(1ULL << toInt(square));
     }
 
     void Bitboard::toggleBit(const Square square) {
         // selbs prinzip wie bei setBit nur mit xor
-        m_value ^= (1ULL << square);
+        m_value ^= (1ULL << toInt(square));
     }
 
     bool Bitboard::getBit(const Square square) const {
         // shiftet das board so:   board = uint8 = 00010000    getbit(4)
         // board >> 4 = 0001
         // 1 & 1 = 1 = true
-        return (m_value >> square) & 1;  // Shift und AND mit 1
+        return (m_value >> toInt(square)) & 1;  // Shift und AND mit 1
     }
 
     Bitboard Bitboard::operator&(const Bitboard &other) const {

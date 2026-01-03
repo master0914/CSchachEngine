@@ -1,124 +1,42 @@
 //
-// Created by augus on 23.12.2025.
+// Created by augus on 03.01.2026.
 //
 
-#ifndef SCHACHENGINE_MOVEGENERATOR_H
-#define SCHACHENGINE_MOVEGENERATOR_H
-#include "ChessBoard.h"
-#include "Movelist.h"
+#ifndef SCHACHENGINE_ATTACKS_H
+#define SCHACHENGINE_ATTACKS_H
+
+#endif //SCHACHENGINE_ATTACKS_H
+#pragma once
+#include "../Bitboard.h"
 
 namespace Chess {
-    class MoveGenerator {
-    public:
-        MoveGenerator() {
-            initKnightAttacks();
-            initPawnAttacks();
-            initPawnPushes();
-            initPawnDoublePushes();
-            initKingAttacks();
-            initRookRays();
-            initBishopRays();
-        }
-        void generateLegalMoves(const ChessBoard& board,
-                                   Movelist& moveList,
-                                   Color sideToMove);
-        void generatePseudoLegalMoves(const ChessBoard& board,
-                                         Movelist& moveList,
-                                         Color sideToMove);
-
-        // nur zum testen
-        void generateMovesFromSquare(const ChessBoard& board,
-                                        Movelist& moveList,
-                                        Square square,
-                                        Color sideToMove);
-    private:
-        // bauern
-        void generatePawnMoves(const ChessBoard& board,
-                                  Movelist& moveList,
-                                  Color color);
-
-        void generatePawnNonCaptures(const ChessBoard& board,
-                                            Movelist& moveList,
-                                            Color color);
-
-        void generatePawnCaptures(const ChessBoard& board,
-                                         Movelist& moveList,
-                                         Color color);
-
-        void generatePawnPromotions(const ChessBoard& board,
-                                           Movelist& moveList,
-                                           Square from, Square to,
-                                           bool isCapture);
-        void generateEnPassantMoves(const ChessBoard& board,
-                                       Movelist& moveList,
-                                       Color color);
-        // springer
-        void generateKnightMoves(const ChessBoard& board,
-                                    Movelist& moveList,
-                                    Color color);
-        // läufer
-        void generateBishopMoves(const ChessBoard& board,
-                                        Movelist& moveList,
-                                        Color color);
-        // türme
-        void generateRookMoves(const ChessBoard& board,
-                                      Movelist& moveList,
-                                      Color color);
-
-        // damen
-        void generateQueenMoves(const ChessBoard& board,
-                                       Movelist& moveList,
-                                       Color color);
-
-        // könige
-        void generateKingMoves(const ChessBoard& board,
-                                      Movelist& moveList,
-                                      Color color);
-        // rochade
-        void generateCastlingMoves(const ChessBoard& board,
-                                      Movelist& moveList,
-                                      Color color);
-
-        // HELPER-----------------------------------
-        // TODO: ATTACK CHECK und precalculated attack tables
-        void isSquareAttacked(const ChessBoard&, Square square, Color color);
-
-        // filtert die illegalen aus der pseudolegal movelist
-        void filterIllegalMoves(const ChessBoard& board,
-                                   Movelist& moveList,
-                                   Color sideToMove);
-        bool canCastleKingside(const ChessBoard& board, Color color);
-        bool canCastleQueenside(const ChessBoard& board, Color color);
-
-        Color oppositeColor(Color color) {
-            return (color == Color::WHITE) ? Color::BLACK : Color::WHITE;
-        }
-        // Direction lookup-----------------------------
-        // r is rank
-        // f is file
-        int knightDr[8] = {-2, -1, 1, 2, 2, 1, -1, -2};
-        int knightDf[8] = {1, 2, 2, 1, -1, -2, -2, -1};
+    namespace Attacks {
+        // knight
+        inline int knightDr[8] = {-2, -1, 1, 2, 2, 1, -1, -2};
+        inline int knightDf[8] = {1, 2, 2, 1, -1, -2, -2, -1};
 
         // King
-        int kingDr[8] = { 1, 1, 1, 0, 0, -1, -1, -1 };
-        int kingDf[8] = { -1, 0, 1, -1, 1, -1, 0, 1 };
+        inline int kingDr[8] = { 1, 1, 1, 0, 0, -1, -1, -1 };
+        inline int kingDf[8] = { -1, 0, 1, -1, 1, -1, 0, 1 };
 
-        // Sliding
-        int rookDr[4]   = { 1, -1, 0, 0 };
-        int rookDf[4]   = { 0, 0, 1, -1 };
+        // sliding
+        inline int rookDr[4]   = { 1, -1, 0, 0 };
+        inline int rookDf[4]   = { 0, 0, 1, -1 };
+        // bishop
+        inline int bishopDr[4] = { 1, 1, -1, -1 };
+        inline int bishopDf[4] = { 1, -1, 1, -1 };
 
-        int bishopDr[4] = { 1, 1, -1, -1 };
-        int bishopDf[4] = { 1, -1, 1, -1 };
+        // attack boards
+        inline Bitboard knightAttacks[64];
+        inline Bitboard kingAttacks[64];
+        inline Bitboard pawnAttacks[2][64];
+        inline Bitboard pawnPushes[2][64];
+        inline Bitboard pawnDoublePushes[2][64];
+        inline Bitboard rookRays[64];
+        inline Bitboard bishopRays[64];
 
-        // Attack Table---------------------------------
-        Bitboard knightAttacks[64];
-        Bitboard kingAttacks[64];
-        Bitboard pawnAttacks[2][64];
-        Bitboard pawnPushes[2][64];
-        Bitboard pawnDoublePushes[2][64];
-        Bitboard rookRays[64];
-        Bitboard bishopRays[64];
-        void initKnightAttacks() {
+        // inits
+        inline void initKnightAttacks() {
             for (int sq = 0; sq < 64; ++sq) {
                 Bitboard attack = Bitboard{};
 
@@ -130,7 +48,7 @@ namespace Chess {
                     int ff = f + knightDf[i];
 
                     if (rr >= 0 && rr < 8 && ff >= 0 && ff < 8) {
-                         attack |= 1ULL << (rr * 8 + ff);
+                        attack |= 1ULL << (rr * 8 + ff);
                         // int bitIndex = rr*8 + ff;
                         // if (bitIndex >= 0 && bitIndex < 64) {
                         //     uint64_t bit = 1ULL << bitIndex;
@@ -148,7 +66,7 @@ namespace Chess {
                 knightAttacks[sq] = attack;
             }
         }
-        void initKingAttacks() {
+        inline void initKingAttacks() {
             for (int sq = 0; sq < 64; ++sq) {
                 Bitboard bb;
                 int r = rankOf(sq);
@@ -165,7 +83,7 @@ namespace Chess {
                 kingAttacks[sq] = bb;
             }
         }
-        void initPawnAttacks() {
+        inline void initPawnAttacks() {
             for (int sq = 0; sq < 64; ++sq) {
                 int r = rankOf(sq);
                 int f = fileOf(sq);
@@ -189,7 +107,7 @@ namespace Chess {
                 pawnAttacks[static_cast<int>(Color::BLACK)][sq] = black;
             }
         }
-        void initPawnPushes() {
+        inline void initPawnPushes() {
             for (int sq = 0; sq < 64; ++sq) {
                 int r = rankOf(sq);
                 int f = fileOf(sq);
@@ -210,7 +128,7 @@ namespace Chess {
                 }
             }
         }
-        void initPawnDoublePushes() {
+        inline void initPawnDoublePushes() {
             for (int sq = 0; sq < 64; ++sq) {
                 int r = rankOf(sq);
                 int f = fileOf(sq);
@@ -230,7 +148,7 @@ namespace Chess {
                 }
             }
         }
-        void initRookRays() {
+        inline void initRookRays() {
             for (int sq = 0; sq < 64; ++sq) {
                 Bitboard bb;
                 int r = rankOf(sq);
@@ -254,7 +172,7 @@ namespace Chess {
                 rookRays[sq] = bb;
             }
         }
-        void initBishopRays() {
+        inline void initBishopRays() {
             for (int sq = 0; sq < 64; ++sq) {
                 Bitboard bb;
                 int r = rankOf(sq);
@@ -278,8 +196,14 @@ namespace Chess {
                 bishopRays[sq] = bb;
             }
         }
-
-    };
+        inline void init() {
+            initKnightAttacks();
+            initPawnAttacks();
+            initPawnPushes();
+            initPawnDoublePushes();
+            initKingAttacks();
+            initRookRays();
+            initBishopRays();
+        }
+    }
 }
-
-#endif //SCHACHENGINE_MOVEGENERATOR_H

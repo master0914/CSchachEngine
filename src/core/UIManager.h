@@ -23,9 +23,8 @@ namespace Chess {
         void renderHeldPiece() const;
         void renderPiece(Piece piece, int x, int y) const;
         void renderMoves() const;
-
-        void renderSelectedSquare(Square square) const;
-
+        void renderSelectedSquare(Square square, uint32_t color) const;
+        void renderMoveSquares(Square square) const;
         void loadImages();
     private:
         Engine::EngineContext& m_context;
