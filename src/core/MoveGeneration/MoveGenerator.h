@@ -77,14 +77,15 @@ namespace Chess {
                                       Movelist& moveList,
                                       Color color);
 
-        // HELPER-----------------------------------
-        // TODO: ATTACK CHECK und precalculated attack tables
+        // Filter illegal moves
+        // TODO: ATTACK CHECK
         void isSquareAttacked(const ChessBoard&, Square square, Color color);
 
         // filtert die illegalen aus der pseudolegal movelist
         void filterIllegalMoves(const ChessBoard& board,
                                    Movelist& moveList,
                                    Color sideToMove);
+        // HELPER-----------------------------------
         bool canCastleKingside(const ChessBoard& board, Color color);
         bool canCastleQueenside(const ChessBoard& board, Color color);
 

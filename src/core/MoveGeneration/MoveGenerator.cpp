@@ -10,6 +10,7 @@ namespace Chess {
     // public methdos-----------------------------------------------------------------------------------------
     void MoveGenerator::generateLegalMoves(const ChessBoard &board, Movelist &moveList, Color sideToMove) {
         generatePseudoLegalMoves(board, moveList, sideToMove);
+        filterIllegalMoves(board, moveList, sideToMove);
     }
 
     void MoveGenerator::generatePseudoLegalMoves(const ChessBoard &board, Movelist &moveList, Color sideToMove) {
@@ -334,6 +335,12 @@ namespace Chess {
     }
 
     void MoveGenerator::generateCastlingMoves(const ChessBoard &board, Movelist &moveList, Color color) {
+    }
+
+    void MoveGenerator::isSquareAttacked(const ChessBoard &, Square square, Color color) {
+    }
+
+    void MoveGenerator::filterIllegalMoves(const ChessBoard &board, Movelist &moveList, Color sideToMove) {
     }
 
     void MoveGenerator::addMove(Movelist &moveList, const Move &move) {

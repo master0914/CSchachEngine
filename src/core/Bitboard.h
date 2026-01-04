@@ -27,7 +27,7 @@ namespace Chess {
         Bitboard operator&(const uint64_t other) const;
         Bitboard operator|(const uint64_t other) const;
         Bitboard operator^(const uint64_t other) const;
-        Bitboard& operator&=(const Bitboard& other);
+        Bitboard &operator&=(const Bitboard& other);
 
         Bitboard &operator|=(const Bitboard &other);
 

@@ -23,7 +23,7 @@ namespace Chess {
             }
         }
 
-        void add(Move m) {
+        void add(Move const m) {
             assert(m_count < MAX_MOVES && "Tried to add more than 256 moves to movelist!! sollte nicht passieren");
             // hier verwende ich assert da das einen katasrophalen error geben würde
             m_moves[m_count++] = m;
@@ -32,7 +32,7 @@ namespace Chess {
         size_t size() const { return m_count; }
         bool empty() const { return m_count == 0; }
 
-        Move operator[](size_t i) {
+        Move operator[](size_t i) const{
             assert(i < m_count && "Tried to acces an index out of bounds!! sollte nicht passieren");
 
             return m_moves[i];
@@ -42,7 +42,7 @@ namespace Chess {
         void pop() {if (m_count > 0) m_count--;}
 
         void sort(){} // evtl nützlich TODO
-        void debugPrint() {
+        void debugPrint() const{
             for (size_t i = 0; i < m_count; i++) {
                 std::cout << m_moves[i] << std::endl;
             }

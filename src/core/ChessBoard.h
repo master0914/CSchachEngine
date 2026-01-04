@@ -19,14 +19,13 @@ namespace Chess {
         Square enPassantSquare;
         int halfMoveClock;
         int fullMoveNumber;
-        Piece capturedPiece;
     };
     class ChessBoard {
     public:
         ChessBoard();
         // move methoden
         void makeMove(Move& move);
-        void undoMove(Move& move);
+        void undoMove();
         // getter
         Piece getPieceAt(Square square) const;
         Bitboard getAttackers(Square square);
@@ -45,6 +44,8 @@ namespace Chess {
 
         Bitboard getOccupied() const;
         Bitboard getOccupancy(Color color) const;
+
+        void debugPrint() const;
     private:
         // TODO: Zobrist Hashing
 
@@ -54,19 +55,25 @@ namespace Chess {
         void updateOccupancy();
         void switchColor();
 
-        Bitboard m_pawns[2];
-        Bitboard m_knights[2];
-        Bitboard m_bishops[2];
-        Bitboard m_rooks[2];
-        Bitboard m_queens[2];
-        Bitboard m_kings[2];
+
+        // ist für unmove notwendig
+        struct LastMoveInfo {
+            // @TODO EnPassantPiece
+            Square from;
+            Square to;
+            Piece movedPiece;
+            Piece capturedPiece; // EMPTY wenn kein Schlag
+        };
+        LastMoveInfo m_lastMove;
+
+
 
         Bitboard m_occupancy[2];    // Colors: white = 0, black = 1
         Bitboard m_occupied;        // all occupied squares  (b and w)
         Color m_sideToMove;
 
         BoardState m_boardState{};
-        std::vector<BoardState> m_gameHistory;
+        Bitboard m_bitboards[2][6];
     };
 
 }

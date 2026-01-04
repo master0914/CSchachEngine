@@ -16,7 +16,6 @@ int main() {
     gc.createGame<Chess::ChessApp>();
     gc.setShowFPS(false);
     gc.run();
-    // Chess::testMoveGenerator();
     return 0;
 }
 
