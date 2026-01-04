@@ -64,16 +64,20 @@ namespace Chess {
             Piece movedPiece;
             Piece capturedPiece; // EMPTY wenn kein Schlag
         };
-        LastMoveInfo m_lastMove;
 
 
+        Bitboard m_bitboards[2][6];
 
         Bitboard m_occupancy[2];    // Colors: white = 0, black = 1
         Bitboard m_occupied;        // all occupied squares  (b and w)
-        Color m_sideToMove;
 
         BoardState m_boardState{};
-        Bitboard m_bitboards[2][6];
+        LastMoveInfo m_lastMove;
+        Color m_sideToMove;
+
+
+
+
     };
 
 }
