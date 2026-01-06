@@ -13,7 +13,7 @@ namespace Chess {
         MoveGenerator() {
 
         }
-        void generateLegalMoves(const ChessBoard& board,
+        void generateLegalMoves(ChessBoard& board,
                                    Movelist& moveList,
                                    Color sideToMove);
         void generatePseudoLegalMoves(const ChessBoard& board,
@@ -79,10 +79,10 @@ namespace Chess {
 
         // Filter illegal moves
         // TODO: ATTACK CHECK
-        void isSquareAttacked(const ChessBoard&, Square square, Color color);
+        bool isSquareAttacked(const ChessBoard&, Square square, Color color);
 
         // filtert die illegalen aus der pseudolegal movelist
-        void filterIllegalMoves(const ChessBoard& board,
+        void filterIllegalMoves(ChessBoard& board,
                                    Movelist& moveList,
                                    Color sideToMove);
         // HELPER-----------------------------------

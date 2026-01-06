@@ -14,8 +14,8 @@ namespace Chess {
     inline void testMoveGenerator() {
         // int sq = 17;
         // std::cout << rankOf(sq) << " " << fileOf(sq) << "\n";
-        ChessBoard board;
-        board.fromFEN(knightTest);
+        ChessBoard board = {};
+        board.debugPrint();
         MoveGenerator moves;
         Movelist movesList;
         moves.generateLegalMoves(board,movesList,Color::WHITE);

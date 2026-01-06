@@ -24,7 +24,7 @@ namespace Chess {
     public:
         ChessBoard();
         // move methoden
-        void makeMove(Move& move);
+        void makeMove(const Move& move);
         void undoMove();
         // getter
         Piece getPieceAt(Square square) const;

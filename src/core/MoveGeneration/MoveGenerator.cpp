@@ -5,12 +5,22 @@
 #include "MoveGenerator.h"
 
 #include "Attacks.h"
+#include <chrono>
 
 namespace Chess {
     // public methdos-----------------------------------------------------------------------------------------
-    void MoveGenerator::generateLegalMoves(const ChessBoard &board, Movelist &moveList, Color sideToMove) {
+    void MoveGenerator::generateLegalMoves(ChessBoard &board, Movelist &moveList, Color sideToMove) {
+
+
+        using Clock = std::chrono::steady_clock;
+
+        auto start = Clock::now();
         generatePseudoLegalMoves(board, moveList, sideToMove);
         filterIllegalMoves(board, moveList, sideToMove);
+        auto end = Clock::now();
+        auto elapsed =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+        std::cout << "Zeit: " << elapsed.count() << " ns\n";
     }
 
     void MoveGenerator::generatePseudoLegalMoves(const ChessBoard &board, Movelist &moveList, Color sideToMove) {
@@ -118,7 +128,6 @@ namespace Chess {
 
     // knights
     void MoveGenerator::generateKnightMoves(const ChessBoard &board, Movelist &moveList, Color color) {
-
         Bitboard ownKnights = board.getBitboard(SimplePieceType::KNIGHT, color);
         Bitboard ownPieces   = board.getOccupancy(color);
         Bitboard enemyPieces = board.getOccupancy(getOtherColor(color));
@@ -337,10 +346,97 @@ namespace Chess {
     void MoveGenerator::generateCastlingMoves(const ChessBoard &board, Movelist &moveList, Color color) {
     }
 
-    void MoveGenerator::isSquareAttacked(const ChessBoard &, Square square, Color color) {
+    bool MoveGenerator::isSquareAttacked(const ChessBoard &board, Square square, Color color) {
+        // hier wird die farbe vom angreifer gegeben
+        Bitboard enemyPawns = board.getBitboard(SimplePieceType::PAWN,color);
+        Bitboard enemyKnights = board.getBitboard(SimplePieceType::KNIGHT,color);
+        Bitboard enemyKings = board.getBitboard(SimplePieceType::KING,color);
+        Bitboard enemyQueens = board.getBitboard(SimplePieceType::QUEEN,color);
+        Bitboard enemyBishops = board.getBitboard(SimplePieceType::BISHOP,color);
+        Bitboard enemyRooks = board.getBitboard(SimplePieceType::ROOK,color);
+
+        Bitboard enemyPieces = board.getOccupancy(color);
+        Bitboard allPieces   = board.getOccupied();
+
+        if (!(Attacks::pawnAttacks[toInt(getOtherColor(color))][toInt(square)] & enemyPawns).isEmpty()) {
+            std::cout << "removed because of Pawn Attack" << std::endl;
+            return true;
+        }
+        if (!(Attacks::knightAttacks[toInt(square)] & enemyKnights).isEmpty()) {
+            std::cout << "removed because of Knight Attack" << std::endl;
+            return true;
+        }
+        if (!(Attacks::kingAttacks[toInt(square)] & enemyKings).isEmpty()) {
+            std::cout << "removed because of King Attack" << std::endl;
+            return true;
+        }
+        // geradlinige angriffe
+        for (int dir = 0; dir < 4; ++dir) {
+            int rank = rankOf(square);
+            int file = fileOf(square);
+
+            while (true) {
+                rank += Attacks::rookDr[dir];
+                file += Attacks::rookDf[dir];
+
+                if (rank < 0 || rank > 7 || file < 0 || file > 7)
+                    break;
+
+                int sq = rank * 8 + file;
+
+                if (allPieces.getBit(static_cast<Square>(sq))) {
+                    if (enemyPieces.getBit(static_cast<Square>(sq))) {
+                        if (enemyQueens.getBit(static_cast<Square>(sq)) || enemyRooks.getBit(static_cast<Square>(sq))) {
+                            std::cout << "removed because of straight Attack" << std::endl;
+                            return true;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        // schräge angriffe
+        for (int dir = 0; dir < 4; ++dir) {
+            int rank = rankOf(square);
+            int file = fileOf(square);
+
+            while (true) {
+                rank += Attacks::bishopDr[dir];
+                file += Attacks::bishopDf[dir];
+
+                if (rank < 0 || rank > 7 || file < 0 || file > 7)
+                    break;
+
+                int sq = rank * 8 + file;
+
+                if (allPieces.getBit(static_cast<Square>(sq))) {
+                    if (enemyPieces.getBit(static_cast<Square>(sq))) {
+                        if (enemyQueens.getBit(static_cast<Square>(sq)) || enemyBishops.getBit(static_cast<Square>(sq))) {
+                            std::cout << "removed because of diagonal Attack" << std::endl;
+                            return true;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        return false;
     }
 
-    void MoveGenerator::filterIllegalMoves(const ChessBoard &board, Movelist &moveList, Color sideToMove) {
+    void MoveGenerator::filterIllegalMoves(ChessBoard &board, Movelist &moveList, Color sideToMove) {
+        Movelist legalMoves;
+
+        for (int i = 0; i< moveList.size(); ++i) {
+            board.makeMove(moveList[i]);
+            std::cout << "checking: " << moveList[i] << std::endl;
+            // @TODO vllt eigenes Tracking für könig im chessboard
+            Bitboard ownKings = board.getBitboard(SimplePieceType::KING, sideToMove);
+            if (!isSquareAttacked(board,static_cast<Square>(ownKings.lsb()),getOtherColor(sideToMove))) {
+                legalMoves.add(moveList[i]);
+            }
+            board.undoMove();
+        }
+        moveList = legalMoves;
     }
 
     void MoveGenerator::addMove(Movelist &moveList, const Move &move) {

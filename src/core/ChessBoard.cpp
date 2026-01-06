@@ -15,7 +15,7 @@ namespace Chess {
         // fromFEN("8/8/8/8/2N2p1P/1p1Np1P1/PPPPPPPP/8 w KQkq - 0 1");
     }
 
-    void ChessBoard::makeMove(Move &move) {
+    void ChessBoard::makeMove(const Move &move) {
         Square from = static_cast<Square>(move.fromSquare());
         Square to = static_cast<Square>(move.toSquare());
         Piece mover = getPieceAt(from);
@@ -81,14 +81,14 @@ namespace Chess {
         if (m_occupancy[0].getBit(square)) { // WHITE
             for (int p = 0; p < 6; ++p) {
                 if (m_bitboards[0][p].getBit(square)) {
-                    return Piece(Color::WHITE, static_cast<SimplePieceType>(p + 1));
+                    return {Color::WHITE, static_cast<SimplePieceType>(p + 1)};
                 }
             }
         }
         else if (m_occupancy[1].getBit(square)){ // BLACK
             for (int p = 0; p < 6; ++p) {
                 if (m_bitboards[1][p].getBit(square)) {
-                    return Piece(Color::BLACK, static_cast<SimplePieceType>(p + 1));
+                    return {Color::BLACK, static_cast<SimplePieceType>(p + 1)};
                 }
             }
         }

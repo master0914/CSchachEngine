@@ -32,10 +32,20 @@ namespace Chess {
         size_t size() const { return m_count; }
         bool empty() const { return m_count == 0; }
 
-        Move operator[](size_t i) const{
+        const Move& operator[](size_t i) const{
             assert(i < m_count && "Tried to acces an index out of bounds!! sollte nicht passieren");
 
             return m_moves[i];
+        }
+        Move& operator[](size_t i){
+            assert(i < m_count && "Tried to acces an index out of bounds!! sollte nicht passieren");
+
+            return m_moves[i];
+        }
+        void removeSwap(size_t index) {
+            assert(index < m_count && "Index out of bounds");
+            m_moves[index] = m_moves[m_count - 1];
+            m_count--;
         }
 
         void clear() { m_count = 0; }
