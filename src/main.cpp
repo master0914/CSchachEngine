@@ -12,7 +12,7 @@
 int main() {
     Chess::Attacks::init();
     // TODO: Clientsize noch im GC korrigieren
-    Engine::GameContainer gc{512+16,512+40,"Schach"};
+    Engine::GameContainer gc{512,512,"Schach"};
     gc.createGame<Chess::ChessApp>();
     gc.setShowFPS(false);
     gc.run();

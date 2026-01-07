@@ -16,10 +16,10 @@ namespace Chess {
         // std::cout << rankOf(sq) << " " << fileOf(sq) << "\n";
         ChessBoard board = {};
         board.debugPrint();
-        MoveGenerator moves;
-        Movelist movesList;
-        moves.generateLegalMoves(board,movesList,Color::WHITE);
-        movesList.debugPrint();
+        // MoveGenerator moves;
+        // Movelist movesList;
+        // moves.generateLegalMoves(board,movesList,Color::WHITE);
+        // movesList.debugPrint();
     }
 
 }
