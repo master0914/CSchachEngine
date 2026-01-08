@@ -29,8 +29,8 @@ namespace Chess {
             m_moves[m_count++] = m;
         }
 
-        size_t size() const { return m_count; }
-        bool empty() const { return m_count == 0; }
+        [[nodiscard]] size_t size() const { return m_count; }
+        [[nodiscard]] bool empty() const { return m_count == 0; }
 
         const Move& operator[](size_t i) const{
             assert(i < m_count && "Tried to acces an index out of bounds!! sollte nicht passieren");

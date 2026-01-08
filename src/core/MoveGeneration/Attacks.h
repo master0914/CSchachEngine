@@ -9,8 +9,8 @@
 #pragma once
 #include "../Bitboard.h"
 
-namespace Chess {
-    namespace Attacks {
+
+    namespace Chess::Attacks {
         // Direction lookup-----------------------------
         // r is rank
         // f is file
@@ -211,4 +211,3 @@ namespace Chess {
             initBishopRays();
         }
     }
-}

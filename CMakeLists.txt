@@ -35,9 +35,14 @@ add_executable(SchachEngine
         src/core/MoveGeneration/Movelist.h
         src/tester.h
         src/core/MoveGeneration/Attacks.h
+        src/util/LogConfig.h
 )
 
 
 
 target_link_libraries(SchachEngine 3DEngineLib)
+
+target_compile_definitions(SchachEngine PRIVATE
+        $<$<CONFIG:Debug>:CHESS_ENABLE_LOGGING>
+)
 

@@ -16,8 +16,8 @@ namespace Chess {
         virtual ~IPlayer() = default;
 
         virtual Move getMove(ChessGame&);
-        bool isHuman() const{return m_isHuman;}
-        bool isWhite() const{return m_isWhite;}
+        [[nodiscard]] bool isHuman() const{return m_isHuman;}
+        [[nodiscard]] bool isWhite() const{return m_isWhite;}
     private:
         bool m_isHuman;
         bool m_isWhite;

@@ -20,6 +20,8 @@ namespace Chess {
         Square to = static_cast<Square>(move.toSquare());
         Piece mover = getPieceAt(from);
 
+        updateCastlingRights(mover,from);
+
         m_lastMove.from = from;
         m_lastMove.to = to;
         m_lastMove.movedPiece = mover;
@@ -43,6 +45,10 @@ namespace Chess {
         m_occupied = m_occupancy[0] | m_occupancy[1];
         // clearSquare(from, mover);
         // setPieceAt(to, mover);
+
+
+        // WICHTIG: BoardState in lastMove speichern
+        m_lastMove.boardState = m_boardState;
 
         switchColor();
     }
@@ -68,6 +74,9 @@ namespace Chess {
 
         // occupancy updaten
         m_occupied = m_occupancy[0] | m_occupancy[1];
+
+        // boardState holen
+        m_boardState = m_lastMove.boardState;
 
         switchColor();
     }
@@ -125,6 +134,56 @@ namespace Chess {
     void ChessBoard::switchColor() {
         m_sideToMove = getOtherColor(m_sideToMove);
     }
+
+    void ChessBoard::updateCastlingRights(Piece piece, Square from) {
+        if (piece.isEmpty())
+            return;
+
+        auto& rights = m_boardState.castlingRights;
+
+        if (rights == NO_CASTLING)
+            return;
+
+        const int sq = toInt(from);
+
+        // König wurde bewegt
+        if (piece.type() == SimplePieceType::KING) {
+            if (piece.color() == Color::WHITE) {
+                if (rights & (WHITE_KINGSIDE | WHITE_QUEENSIDE)) {
+                    rights = static_cast<CastlingRights>(
+                        rights & ~(WHITE_KINGSIDE | WHITE_QUEENSIDE)
+                    );
+                }
+            } else {
+                if (rights & (BLACK_KINGSIDE | BLACK_QUEENSIDE)) {
+                    rights = static_cast<CastlingRights>(
+                        rights & ~(BLACK_KINGSIDE | BLACK_QUEENSIDE)
+                    );
+                }
+            }
+            return;
+        }
+
+        if (piece.type() != SimplePieceType::ROOK)
+            return;
+
+        if (piece.color() == Color::WHITE) {
+            if (sq == toInt(Square::A1) && (rights & WHITE_QUEENSIDE)) {
+                rights = static_cast<CastlingRights>(rights & ~WHITE_QUEENSIDE);
+            }
+            else if (sq == toInt(Square::H1) && (rights & WHITE_KINGSIDE)) {
+                rights = static_cast<CastlingRights>(rights & ~WHITE_KINGSIDE);
+            }
+        } else {
+            if (sq == toInt(Square::A8) && (rights & BLACK_QUEENSIDE)) {
+                rights = static_cast<CastlingRights>(rights & ~BLACK_QUEENSIDE);
+            }
+            else if (sq == toInt(Square::H8) && (rights & BLACK_KINGSIDE)) {
+                rights = static_cast<CastlingRights>(rights & ~BLACK_KINGSIDE);
+            }
+        }
+    }
+
     void ChessBoard::clear() {
         for (int c = 0; c < 2; ++c) {
             for (int p = 0; p < 6; ++p) {

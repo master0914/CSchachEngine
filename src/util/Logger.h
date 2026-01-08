@@ -88,9 +88,9 @@ namespace Chess {
             << msg
             << std::endl;
     }
-// #define LOG_INFO(msg)  Chess::log(Chess::Level::Info,  msg, __FILE__, __LINE__)
-// #define LOG_WARN(msg)  Chess::log(Chess::Level::Warn,  msg, __FILE__, __LINE__)
-// #define LOG_ERROR(msg) Chess::log(Chess::Level::Error, msg, __FILE__, __LINE__)
+}
+#ifdef CHESS_ENABLE_LOGGING
+
 #define LOG_INFO(msg)  do { \
 std::ostringstream _oss; \
 _oss << msg; \
@@ -108,4 +108,41 @@ std::ostringstream _oss; \
 _oss << msg; \
 Chess::log(Chess::Level::Error, _oss.str(), __FILE__, __LINE__); \
 } while(0)
-}
+
+#else
+
+#define LOG_INFO(msg)  ((void)0)
+#define LOG_WARN(msg)  ((void)0)
+#define LOG_ERROR(msg) ((void)0)
+
+#endif
+
+#if LOG_ENABLE_MOVEGEN
+#define LOG_MOVEGEN(msg) LOG_INFO(msg)
+#else
+#define LOG_MOVEGEN(msg) ((void)0)
+#endif
+
+#if LOG_ENABLE_SEARCH
+#define LOG_SEARCH(msg) LOG_INFO(msg)
+#else
+#define LOG_SEARCH(msg) ((void)0)
+#endif
+
+#if LOG_ENABLE_UI
+#define LOG_UI(msg) LOG_INFO(msg)
+#else
+#define LOG_UI(msg) ((void)0)
+#endif
+
+#if LOG_ENABLE_RENDER
+#define LOG_RENDER(msg) LOG_INFO(msg)
+#else
+#define LOG_RENDER(msg) ((void)0)
+#endif
+
+#if LOG_ENABLE_BOARD
+#define LOG_BOARD(msg) LOG_INFO(msg)
+#else
+#define LOG_BOARD(msg) ((void)0)
+#endif

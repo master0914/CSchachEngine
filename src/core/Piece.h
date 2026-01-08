@@ -33,14 +33,14 @@ namespace Chess {
             }
         }
 
-        bool isEmpty() const { return type() == SimplePieceType::NONE; }
-        Color color() const { return static_cast<Color>(m_data >> 3); }
-        SimplePieceType type() const { return static_cast<SimplePieceType>(m_data & 0x07); }
+        [[nodiscard]] bool isEmpty() const { return type() == SimplePieceType::NONE; }
+        [[nodiscard]] Color color() const { return static_cast<Color>(m_data >> 3); }
+        [[nodiscard]] SimplePieceType type() const { return static_cast<SimplePieceType>(m_data & 0x07); }
 
         bool operator==(const Piece& other) const { return m_data == other.m_data; }
         bool operator!=(const Piece& other) const { return m_data != other.m_data; }
 
-        char toChar() const {
+        [[nodiscard]] char toChar() const {
             if (isEmpty()) return '.';
 
             char c;

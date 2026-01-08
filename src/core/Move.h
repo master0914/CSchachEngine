@@ -40,24 +40,24 @@ namespace Chess {
         }
 
         // Getter
-        int fromSquare() const;
-        int toSquare() const;
-        SimplePieceType promotionPiece() const;
-        Flag flags() const;
+        [[nodiscard]] int fromSquare() const;
+        [[nodiscard]] int toSquare() const;
+        [[nodiscard]] SimplePieceType promotionPiece() const;
+        [[nodiscard]] Flag flags() const;
 
         // Flags Check
-        bool isCapture() const;
-        bool isPromotion() const;
-        bool isEnPassant() const;
-        bool isCastle() const;
-        bool isDoublePawnPush() const;
+        [[nodiscard]] bool isCapture() const;
+        [[nodiscard]] bool isPromotion() const;
+        [[nodiscard]] bool isEnPassant() const;
+        [[nodiscard]] bool isCastle() const;
+        [[nodiscard]] bool isDoublePawnPush() const;
 
-        bool isValid() const;
+        [[nodiscard]] bool isValid() const;
 
         // Vergleichsoperatoren für Sorting
-        bool operator<(const Move& other) const;
+        bool operator<(const Move& other) const; // nicht implementiert
         bool operator==(const Move& other) const;
-        bool isSameWithoutFlag(const Move& other) const {
+        [[nodiscard]] bool isSameWithoutFlag(const Move& other) const {
             return (fromSquare() == other.fromSquare() && toSquare() == other.toSquare());
         }
 

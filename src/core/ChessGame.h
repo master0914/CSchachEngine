@@ -25,9 +25,10 @@ namespace Chess {
 
         // const std::vector<Move>& getLegalMoves() const { return m_legalMoves; }
         // Color getCurrentPlayer() const { return m_currentPlayer; }
-        const ChessBoard& getBoard() const { return m_board; }
-        const int getSelectedSquare() const {return m_selectedSquare;}
-        const Movelist& getMoveList() const {return m_legalMoves;}
+        [[nodiscard]] const ChessBoard& getBoard() const { return m_board; }
+        // int ist anscheinend top-level const?
+        [[nodiscard]] int getSelectedSquare() const {return m_selectedSquare;}
+        [[nodiscard]] const Movelist& getMoveList() const {return m_legalMoves;}
     private:
         ChessBoard m_board;
         // in echter boardposition angegeben

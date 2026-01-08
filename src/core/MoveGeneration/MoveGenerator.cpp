@@ -10,13 +10,12 @@
 namespace Chess {
     // public methdos-----------------------------------------------------------------------------------------
     void MoveGenerator::generateLegalMoves(ChessBoard &board, Movelist &moveList, Color sideToMove) {
-
-
         using Clock = std::chrono::steady_clock;
-
         auto start = Clock::now();
+
         generatePseudoLegalMoves(board, moveList, sideToMove);
         filterIllegalMoves(board, moveList, sideToMove);
+
         auto end = Clock::now();
         auto elapsed =
             std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
@@ -24,29 +23,29 @@ namespace Chess {
     }
 
     void MoveGenerator::generatePseudoLegalMoves(const ChessBoard &board, Movelist &moveList, Color sideToMove) {
-        LOG_INFO("Generating knight moves:");
+        LOG_MOVEGEN("Generating knight moves:");
         generateKnightMoves(board, moveList, sideToMove);
-        LOG_INFO("Generating knight moves over!" << std::endl);
+        LOG_MOVEGEN("Generating knight moves over!" << std::endl);
 
-        LOG_INFO("Generating Pawn moves:");
+        LOG_MOVEGEN("Generating Pawn moves:");
         generatePawnMoves(board, moveList, sideToMove);
-        LOG_INFO("Generating pawn moves over!" << std::endl);
+        LOG_MOVEGEN("Generating pawn moves over!" << std::endl);
 
-        LOG_INFO("Generating bishop moves:");
+        LOG_MOVEGEN("Generating bishop moves:");
         generateBishopMoves(board, moveList, sideToMove);
-        LOG_INFO("Generating bishop moves over" << std::endl);
+        LOG_MOVEGEN("Generating bishop moves over" << std::endl);
 
-        LOG_INFO("Generating rook moves:");
+        LOG_MOVEGEN("Generating rook moves:");
         generateRookMoves(board, moveList, sideToMove);
-        LOG_INFO("Generating rook moves over" << std::endl);
+        LOG_MOVEGEN("Generating rook moves over" << std::endl);
 
-        LOG_INFO("Generating queen moves:");
+        LOG_MOVEGEN("Generating queen moves:");
         generateQueenMoves(board, moveList, sideToMove);
-        LOG_INFO("Generating queen moves over" << std::endl);
+        LOG_MOVEGEN("Generating queen moves over" << std::endl);
 
-        LOG_INFO("Generating King moves:");
+        LOG_MOVEGEN("Generating King moves:");
         generateKingMoves(board, moveList, sideToMove);
-        LOG_INFO("Generating King moves over" << std::endl);
+        LOG_MOVEGEN("Generating King moves over" << std::endl);
     }
 
     void MoveGenerator::generateMovesFromSquare(const ChessBoard &board, Movelist &moveList, Square square,
@@ -56,13 +55,13 @@ namespace Chess {
     // private methods--------------------------------------------------------------------------------------------
     // pawn stuff
     void MoveGenerator::generatePawnMoves(const ChessBoard &board, Movelist &moveList, Color color) {
-        LOG_INFO("Generating PawnNonCapture moves:");
+        LOG_MOVEGEN("Generating PawnNonCapture moves:");
         generatePawnNonCaptures(board, moveList, color);
-        LOG_INFO("Generating PawnNonCapture moves over" << std::endl);
+        LOG_MOVEGEN("Generating PawnNonCapture moves over" << std::endl);
 
-        LOG_INFO("Generating Capture moves:");
+        LOG_MOVEGEN("Generating Capture moves:");
         generatePawnCaptures(board, moveList, color);
-        LOG_INFO("Generating Capture moves over" << std::endl);
+        LOG_MOVEGEN("Generating Capture moves over" << std::endl);
     }
 
     void MoveGenerator::generatePawnNonCaptures(const ChessBoard &board, Movelist &moveList, Color color) {
@@ -315,13 +314,13 @@ namespace Chess {
 
     // king
     void MoveGenerator::generateKingMoves(const ChessBoard &board, Movelist &moveList, Color color) {
-        LOG_INFO("Generating Normal king moves");
+        LOG_MOVEGEN("Generating Normal king moves");
         generateNormalKingMoves(board, moveList, color);
-        LOG_INFO("Generating Normal king moves over" << std::endl);
+        LOG_MOVEGEN("Generating Normal king moves over" << std::endl);
 
-        LOG_INFO("Generating Rochade moves");
+        LOG_MOVEGEN("Generating Rochade moves");
         generateCastlingMoves(board, moveList, color);
-        LOG_INFO("Generating Rochade moves over" << std::endl);
+        LOG_MOVEGEN("Generating Rochade moves over" << std::endl);
     }
 
     void MoveGenerator::generateNormalKingMoves(const ChessBoard &board, Movelist &moveList, Color color) {
@@ -359,15 +358,15 @@ namespace Chess {
         Bitboard allPieces   = board.getOccupied();
 
         if (!(Attacks::pawnAttacks[toInt(getOtherColor(color))][toInt(square)] & enemyPawns).isEmpty()) {
-            std::cout << "removed because of Pawn Attack" << std::endl;
+            LOG_MOVEGEN("removed because of Pawn Attack" << std::endl);
             return true;
         }
         if (!(Attacks::knightAttacks[toInt(square)] & enemyKnights).isEmpty()) {
-            std::cout << "removed because of Knight Attack" << std::endl;
+            LOG_MOVEGEN("removed because of Knight Attack" << std::endl);
             return true;
         }
         if (!(Attacks::kingAttacks[toInt(square)] & enemyKings).isEmpty()) {
-            std::cout << "removed because of King Attack" << std::endl;
+            LOG_MOVEGEN("removed because of King Attack" << std::endl);
             return true;
         }
         // geradlinige angriffe
@@ -387,7 +386,7 @@ namespace Chess {
                 if (allPieces.getBit(static_cast<Square>(sq))) {
                     if (enemyPieces.getBit(static_cast<Square>(sq))) {
                         if (enemyQueens.getBit(static_cast<Square>(sq)) || enemyRooks.getBit(static_cast<Square>(sq))) {
-                            std::cout << "removed because of straight Attack" << std::endl;
+                            LOG_MOVEGEN("removed because of straight Attack" << std::endl);
                             return true;
                         }
                     }
@@ -412,7 +411,7 @@ namespace Chess {
                 if (allPieces.getBit(static_cast<Square>(sq))) {
                     if (enemyPieces.getBit(static_cast<Square>(sq))) {
                         if (enemyQueens.getBit(static_cast<Square>(sq)) || enemyBishops.getBit(static_cast<Square>(sq))) {
-                            std::cout << "removed because of diagonal Attack" << std::endl;
+                            LOG_MOVEGEN("removed because of diagonal Attack" << std::endl);
                             return true;
                         }
                     }
@@ -424,11 +423,12 @@ namespace Chess {
     }
 
     void MoveGenerator::filterIllegalMoves(ChessBoard &board, Movelist &moveList, Color sideToMove) {
+        LOG_MOVEGEN("Filtering IllegalMoves: ");
         Movelist legalMoves;
 
         for (int i = 0; i< moveList.size(); ++i) {
             board.makeMove(moveList[i]);
-            std::cout << "checking: " << moveList[i] << std::endl;
+            LOG_MOVEGEN("checking: " << moveList[i]);
             // @TODO vllt eigenes Tracking für könig im chessboard
             Bitboard ownKings = board.getBitboard(SimplePieceType::KING, sideToMove);
             if (!isSquareAttacked(board,static_cast<Square>(ownKings.lsb()),getOtherColor(sideToMove))) {
@@ -437,11 +437,12 @@ namespace Chess {
             board.undoMove();
         }
         moveList = legalMoves;
+        LOG_MOVEGEN("Filtering IllegalMoves over" << std::endl);
     }
 
     void MoveGenerator::addMove(Movelist &moveList, const Move &move) {
         // eig nur zum debuggen der LOG wird im release entfernt
-        LOG_INFO("adding move: " << move);
+        LOG_MOVEGEN("adding move: " << move);
         moveList.add(move);
     }
 }

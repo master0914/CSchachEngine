@@ -68,7 +68,9 @@ namespace Chess {
     }
 
     // Vergleichsoperatoren für Sorting   (prb redundant)
-    bool Move::operator<(const Move& other) const{}
+    bool Move::operator<(const Move& other) const {
+        return false;
+    }
     bool Move::operator==(const Move& other) const{return m_data == other.m_data;}
 
     bool Move::isValid() const { return m_data != 0; }

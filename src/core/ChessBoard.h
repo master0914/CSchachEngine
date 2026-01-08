@@ -55,14 +55,17 @@ namespace Chess {
         void updateOccupancy();
         void switchColor();
 
+        // kriegt das bewegte Piece übergeben
+        void updateCastlingRights(Piece piece, Square from);
+
 
         // ist für unmove notwendig
         struct LastMoveInfo {
-            // @TODO EnPassantPiece
             Square from;
             Square to;
             Piece movedPiece;
             Piece capturedPiece; // EMPTY wenn kein Schlag
+            BoardState boardState;
         };
 
 
