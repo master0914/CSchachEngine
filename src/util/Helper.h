@@ -47,8 +47,8 @@ namespace Chess {
         PROMO_N = 0x8,          // 1000
         CAPTURE_PROMO_N = 0x9,  // 1001
         EN_PASSANT = 0xA,       // 1010
-        CASTEL_KINGSIDE = 0xB,  // 1011
-        CASTLE_QUEENSID = 0xC,  // 1100
+        CASTLE_KINGSIDE = 0xB,  // 1011
+        CASTLE_QUEENSIDE = 0xC,  // 1100
         DOUBLE_PAWN_PUSH = 0xD  // 1101
         // 0xE und 0xF können noch für anderen shit verwendet werden
     };
@@ -77,9 +77,9 @@ namespace Chess {
                 return os << "CapturePromoN";
             case Flag::EN_PASSANT:
                 return os << "EnPassant";
-            case Flag::CASTEL_KINGSIDE:
+            case Flag::CASTLE_KINGSIDE:
                 return os << "CastleKingSide";
-            case Flag::CASTLE_QUEENSID:
+            case Flag::CASTLE_QUEENSIDE:
                 return os << "CastleQueensSide";
             case Flag::DOUBLE_PAWN_PUSH:
                 return os << "DoublePawnPush";

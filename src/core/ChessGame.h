@@ -18,8 +18,11 @@ namespace Chess {
             updateLegalMoves();
         }
         void makeMove(Move& move);
+
         void handleLeftClickOnSquare(int square);
         void handleRightClickOnSquare();
+        void handleClickOnR();
+
         bool isMoveLegal(Move& move);
         Piece getPieceAt(int square);
 
@@ -29,6 +32,9 @@ namespace Chess {
         // int ist anscheinend top-level const?
         [[nodiscard]] int getSelectedSquare() const {return m_selectedSquare;}
         [[nodiscard]] const Movelist& getMoveList() const {return m_legalMoves;}
+
+
+
     private:
         ChessBoard m_board;
         // in echter boardposition angegeben

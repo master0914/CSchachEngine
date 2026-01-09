@@ -86,11 +86,10 @@ namespace Chess {
                                    Movelist& moveList,
                                    Color sideToMove);
         // HELPER-----------------------------------
-        bool canCastleKingside(const ChessBoard& board, Color color);
-        bool canCastleQueenside(const ChessBoard& board, Color color);
 
         void addMove(Movelist& moveList, const Move& move);
 
+        Move makeCastlingMove(CastlingRights type);
     };
 }
 

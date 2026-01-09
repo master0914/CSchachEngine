@@ -10,8 +10,9 @@
 #pragma once
 
 // hier umschalten um verschiedene Loggings zu de-/aktivieren
-#define LOG_ENABLE_MOVEGEN      1
-#define LOG_ENABLE_SEARCH       1
+#define LOG_ENABLE_MOVEGEN      0
+#define LOG_ENABLE_SEARCH       0
 #define LOG_ENABLE_UI           0
 #define LOG_ENABLE_RENDER       0
-#define LOG_ENABLE_BOARD        0
+#define LOG_ENABLE_BOARD        1
+#define LOG_ENABLE_TIMING       0

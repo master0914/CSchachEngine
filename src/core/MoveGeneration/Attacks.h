@@ -10,25 +10,44 @@
 #include "../Bitboard.h"
 
 
-    namespace Chess::Attacks {
+namespace Chess {
+    namespace CastlingMasks {
+        // occupied mit diesen Masken AND
+        constexpr uint64_t WHITE_KINGSIDE_EMPTY =
+            (1ULL << toInt(Square::F1)) |
+                (1ULL << toInt(Square::G1));
+        constexpr uint64_t WHITE_QUEENSIDE_EMPTY =
+            (1ULL << toInt(Square::B1)) |
+                (1ULL << toInt(Square::C1)) |
+                    (1ULL << toInt(Square::D1));
+        constexpr uint64_t BLACK_KINGSIDE_EMPTY =
+            (1ULL << toInt(Square::F8)) |
+                (1ULL << toInt(Square::G8));
+        constexpr uint64_t BLACK_QUEENSIDE_EMPTY =
+            (1ULL << toInt(Square::B8)) |
+                (1ULL << toInt(Square::C8)) |
+                    (1ULL << toInt(Square::D8));
+
+    }
+    namespace Attacks{
         // Direction lookup-----------------------------
         // r is rank
         // f is file
 
         // knight
-        inline int knightDr[8] = {-2, -1, 1, 2, 2, 1, -1, -2};
-        inline int knightDf[8] = {1, 2, 2, 1, -1, -2, -2, -1};
+        constexpr int knightDr[8] = {-2, -1, 1, 2, 2, 1, -1, -2};
+        constexpr int knightDf[8] = {1, 2, 2, 1, -1, -2, -2, -1};
 
         // King
-        inline int kingDr[8] = { 1, 1, 1, 0, 0, -1, -1, -1 };
-        inline int kingDf[8] = { -1, 0, 1, -1, 1, -1, 0, 1 };
+        constexpr int kingDr[8] = { 1, 1, 1, 0, 0, -1, -1, -1 };
+        constexpr int kingDf[8] = { -1, 0, 1, -1, 1, -1, 0, 1 };
 
         // sliding
-        inline int rookDr[4]   = { 1, -1, 0, 0 };
-        inline int rookDf[4]   = { 0, 0, 1, -1 };
+        constexpr int rookDr[4]   = { 1, -1, 0, 0 };
+        constexpr int rookDf[4]   = { 0, 0, 1, -1 };
         // bishop
-        inline int bishopDr[4] = { 1, 1, -1, -1 };
-        inline int bishopDf[4] = { 1, -1, 1, -1 };
+        constexpr int bishopDr[4] = { 1, 1, -1, -1 };
+        constexpr int bishopDf[4] = { 1, -1, 1, -1 };
 
         // Attack Table---------------------------------
         // attack boards
@@ -211,3 +230,4 @@
             initBishopRays();
         }
     }
+}

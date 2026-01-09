@@ -27,23 +27,26 @@ namespace Chess {
         void makeMove(const Move& move);
         void undoMove();
         // getter
-        Piece getPieceAt(Square square) const;
-        Bitboard getAttackers(Square square);
-        Color getSideToMove() const;
+        [[nodiscard]] Piece getPieceAt(Square square) const;
+        [[nodiscard]] Bitboard getAttackers(Square square);
+        [[nodiscard]] Color getSideToMove() const;
         // FEN helper
         std::string toFEN();
         void fromFEN(const std::string& fen);
         // game state helper
-        bool isCheck() const;
-        bool isCheckmate() const;
-        bool isStalemate() const;
-        bool isDraw() const;
+        [[nodiscard]] bool isCheck() const;
+        [[nodiscard]] bool isCheckmate() const;
+        [[nodiscard]] bool isStalemate() const;
+        [[nodiscard]] bool isDraw() const;
 
-        Bitboard getBitboard(Piece pieceType) const;
-        Bitboard getBitboard(SimplePieceType piece, Color color) const;
+        [[nodiscard]] Bitboard getBitboard(Piece pieceType) const;
+        [[nodiscard]] Bitboard getBitboard(SimplePieceType piece, Color color) const;
 
-        Bitboard getOccupied() const;
-        Bitboard getOccupancy(Color color) const;
+        [[nodiscard]] Bitboard getOccupied() const;
+        [[nodiscard]] Bitboard getOccupancy(Color color) const;
+
+        [[nodiscard]] CastlingRights getCastlingRights() const;
+        [[nodiscard]] Square getEnPassantSquare() const;
 
         void debugPrint() const;
     private:
@@ -56,7 +59,7 @@ namespace Chess {
         void switchColor();
 
         // kriegt das bewegte Piece übergeben
-        void updateCastlingRights(Piece piece, Square from);
+        void updateCastlingRights(Piece piece, Square from, Piece capturedPiece, Square to);
 
 
         // ist für unmove notwendig
@@ -66,6 +69,7 @@ namespace Chess {
             Piece movedPiece;
             Piece capturedPiece; // EMPTY wenn kein Schlag
             BoardState boardState;
+            bool undone = true;
         };
 
 

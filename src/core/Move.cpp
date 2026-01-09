@@ -61,7 +61,7 @@ namespace Chess {
     }
     bool Move::isCastle() const{
         Flag f = flags();
-        return f == Flag::CASTEL_KINGSIDE || f == Flag::CASTLE_QUEENSID;
+        return f == Flag::CASTLE_KINGSIDE || f == Flag::CASTLE_QUEENSIDE;
     }
     bool Move::isDoublePawnPush() const{
         return flags() == Flag::DOUBLE_PAWN_PUSH;

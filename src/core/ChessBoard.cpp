@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "../util/Logger.h"
+#include <bitset>
 
 namespace Chess {
     ChessBoard::ChessBoard() {
@@ -20,12 +21,19 @@ namespace Chess {
         Square to = static_cast<Square>(move.toSquare());
         Piece mover = getPieceAt(from);
 
-        updateCastlingRights(mover,from);
+
 
         m_lastMove.from = from;
         m_lastMove.to = to;
         m_lastMove.movedPiece = mover;
         m_lastMove.capturedPiece = getPieceAt(to);
+        m_lastMove.undone = false;
+        // WICHTIG: BoardState in lastMove speichern
+        m_lastMove.boardState = m_boardState;
+
+        // update CastlingRights muss danach passieren da sonst castling nicht richtig undone wird
+        updateCastlingRights(mover,from, m_lastMove.capturedPiece, to);
+        LOG_BOARD("new CastlingRights after move " << move << "     " << std::bitset<8>(m_boardState.castlingRights));
 
         // ja mir ist klar bitboard operations sind hässlich aber es ist schneller als setPieceAt
         // mover von from entfernen
@@ -41,21 +49,54 @@ namespace Chess {
         m_bitboards[toInt(mover.color())][toInt(mover.type()) - 1].setBit(to);
         m_occupancy[toInt(mover.color())].setBit(to);
 
+        // Turm für rochade gewegen
+        if (move.flags() == Flag::CASTLE_KINGSIDE) {
+            if (mover.color() == Color::WHITE) {
+                // Turm von H1 nach F1
+                m_bitboards[toInt(Color::WHITE)][toInt(SimplePieceType::ROOK) - 1].clearBit(Square::H1);
+                m_bitboards[toInt(Color::WHITE)][toInt(SimplePieceType::ROOK) - 1].setBit(Square::F1);
+                m_occupancy[toInt(Color::WHITE)].clearBit(Square::H1);
+                m_occupancy[toInt(Color::WHITE)].setBit(Square::F1);
+            } else {
+                // Turm von H8 nach F8
+                m_bitboards[toInt(Color::BLACK)][toInt(SimplePieceType::ROOK) - 1].clearBit(Square::H8);
+                m_bitboards[toInt(Color::BLACK)][toInt(SimplePieceType::ROOK) - 1].setBit(Square::F8);
+                m_occupancy[toInt(Color::BLACK)].clearBit(Square::H8);
+                m_occupancy[toInt(Color::BLACK)].setBit(Square::F8);
+            }
+        } else if (move.flags() ==Flag::CASTLE_QUEENSIDE) {
+            if (mover.color() == Color::WHITE) {
+                // Turm von A1 nach D1
+                m_bitboards[toInt(Color::WHITE)][toInt(SimplePieceType::ROOK) - 1].clearBit(Square::A1);
+                m_bitboards[toInt(Color::WHITE)][toInt(SimplePieceType::ROOK) - 1].setBit(Square::D1);
+                m_occupancy[toInt(Color::WHITE)].clearBit(Square::A1);
+                m_occupancy[toInt(Color::WHITE)].setBit(Square::D1);
+            } else {
+                // Turm von A8 nach D8
+                m_bitboards[toInt(Color::BLACK)][toInt(SimplePieceType::ROOK) - 1].clearBit(Square::A8);
+                m_bitboards[toInt(Color::BLACK)][toInt(SimplePieceType::ROOK) - 1].setBit(Square::D8);
+                m_occupancy[toInt(Color::BLACK)].clearBit(Square::A8);
+                m_occupancy[toInt(Color::BLACK)].setBit(Square::D8);
+            }
+        }
+
         // occupancy updaten
         m_occupied = m_occupancy[0] | m_occupancy[1];
         // clearSquare(from, mover);
         // setPieceAt(to, mover);
 
 
-        // WICHTIG: BoardState in lastMove speichern
-        m_lastMove.boardState = m_boardState;
+
 
         switchColor();
     }
 
     // WICHTIG!! keine move history! soll nur direkt nach makeMove aufgerufen werden!!
     void ChessBoard::undoMove() {
-        // TODO boardstate undoen
+        if (m_lastMove.undone) {
+            LOG_WARN("Tried to undo twice");
+            return;
+        }
         Piece movedPiece = m_lastMove.movedPiece;
 
         // movedPiece von to entfernen
@@ -71,6 +112,30 @@ namespace Chess {
             m_bitboards[toInt(m_lastMove.capturedPiece.color())][toInt(m_lastMove.capturedPiece.type()) - 1].setBit(m_lastMove.to);
             m_occupancy[toInt(m_lastMove.capturedPiece.color())].setBit(m_lastMove.to);
         }
+        // Turm wieder zurückbewegen
+        if (m_lastMove.movedPiece.type() == SimplePieceType::KING) {
+            if (m_lastMove.to == Square::G1) { // Weiß kurze Rochade
+                m_bitboards[toInt(Color::WHITE)][toInt(SimplePieceType::ROOK) - 1].clearBit(Square::F1);
+                m_bitboards[toInt(Color::WHITE)][toInt(SimplePieceType::ROOK) - 1].setBit(Square::H1);
+                m_occupancy[toInt(Color::WHITE)].clearBit(Square::F1);
+                m_occupancy[toInt(Color::WHITE)].setBit(Square::H1);
+            } else if (m_lastMove.to == Square::C1) { // Weiß lange Rochade
+                m_bitboards[toInt(Color::WHITE)][toInt(SimplePieceType::ROOK) - 1].clearBit(Square::D1);
+                m_bitboards[toInt(Color::WHITE)][toInt(SimplePieceType::ROOK) - 1].setBit(Square::A1);
+                m_occupancy[toInt(Color::WHITE)].clearBit(Square::D1);
+                m_occupancy[toInt(Color::WHITE)].setBit(Square::A1);
+            } else if (m_lastMove.to == Square::G8) { // Schwarz kurze Rochade
+                m_bitboards[toInt(Color::BLACK)][toInt(SimplePieceType::ROOK) - 1].clearBit(Square::F8);
+                m_bitboards[toInt(Color::BLACK)][toInt(SimplePieceType::ROOK) - 1].setBit(Square::H8);
+                m_occupancy[toInt(Color::BLACK)].clearBit(Square::F8);
+                m_occupancy[toInt(Color::BLACK)].setBit(Square::H8);
+            } else if (m_lastMove.to == Square::C8) { // Schwarz lange Rochade
+                m_bitboards[toInt(Color::BLACK)][toInt(SimplePieceType::ROOK) - 1].clearBit(Square::D8);
+                m_bitboards[toInt(Color::BLACK)][toInt(SimplePieceType::ROOK) - 1].setBit(Square::A8);
+                m_occupancy[toInt(Color::BLACK)].clearBit(Square::D8);
+                m_occupancy[toInt(Color::BLACK)].setBit(Square::A8);
+            }
+        }
 
         // occupancy updaten
         m_occupied = m_occupancy[0] | m_occupancy[1];
@@ -78,6 +143,7 @@ namespace Chess {
         // boardState holen
         m_boardState = m_lastMove.boardState;
 
+        m_lastMove.undone = true;
         switchColor();
     }
 
@@ -135,7 +201,7 @@ namespace Chess {
         m_sideToMove = getOtherColor(m_sideToMove);
     }
 
-    void ChessBoard::updateCastlingRights(Piece piece, Square from) {
+    void ChessBoard::updateCastlingRights(Piece piece, Square from, Piece capturedPiece, Square to) {
         if (piece.isEmpty())
             return;
 
@@ -164,22 +230,36 @@ namespace Chess {
             return;
         }
 
-        if (piece.type() != SimplePieceType::ROOK)
-            return;
-
-        if (piece.color() == Color::WHITE) {
-            if (sq == toInt(Square::A1) && (rights & WHITE_QUEENSIDE)) {
-                rights = static_cast<CastlingRights>(rights & ~WHITE_QUEENSIDE);
+        if (piece.type() == SimplePieceType::ROOK) {
+            if (piece.color() == Color::WHITE) {
+                if (sq == toInt(Square::A1) && (rights & WHITE_QUEENSIDE)) {
+                    rights = static_cast<CastlingRights>(rights & ~WHITE_QUEENSIDE);
+                }
+                else if (sq == toInt(Square::H1) && (rights & WHITE_KINGSIDE)) {
+                    rights = static_cast<CastlingRights>(rights & ~WHITE_KINGSIDE);
+                }
+            } else {
+                if (sq == toInt(Square::A8) && (rights & BLACK_QUEENSIDE)) {
+                    rights = static_cast<CastlingRights>(rights & ~BLACK_QUEENSIDE);
+                }
+                else if (sq == toInt(Square::H8) && (rights & BLACK_KINGSIDE)) {
+                    rights = static_cast<CastlingRights>(rights & ~BLACK_KINGSIDE);
+                }
             }
-            else if (sq == toInt(Square::H1) && (rights & WHITE_KINGSIDE)) {
-                rights = static_cast<CastlingRights>(rights & ~WHITE_KINGSIDE);
-            }
-        } else {
-            if (sq == toInt(Square::A8) && (rights & BLACK_QUEENSIDE)) {
-                rights = static_cast<CastlingRights>(rights & ~BLACK_QUEENSIDE);
-            }
-            else if (sq == toInt(Square::H8) && (rights & BLACK_KINGSIDE)) {
-                rights = static_cast<CastlingRights>(rights & ~BLACK_KINGSIDE);
+        }
+        if (capturedPiece.type() == SimplePieceType::ROOK) {
+            if (capturedPiece.color() == Color::WHITE) {
+                const int sqTo = toInt(to);
+                if (sqTo == toInt(Square::A1))
+                    rights = static_cast<CastlingRights>(rights & ~WHITE_QUEENSIDE);
+                else if (sqTo == toInt(Square::H1))
+                    rights = static_cast<CastlingRights>(rights & ~WHITE_KINGSIDE);
+            } else {
+                const int sqTo = toInt(to);
+                if (sqTo == toInt(Square::A8))
+                    rights = static_cast<CastlingRights>(rights & ~BLACK_QUEENSIDE);
+                else if (sqTo == toInt(Square::H8))
+                    rights = static_cast<CastlingRights>(rights & ~BLACK_KINGSIDE);
             }
         }
     }
@@ -227,6 +307,14 @@ namespace Chess {
     }
     Bitboard ChessBoard::getOccupancy(Color color) const {
         return m_occupancy[static_cast<int>(color)];
+    }
+
+    CastlingRights ChessBoard::getCastlingRights() const {
+        return m_boardState.castlingRights;
+    }
+
+    Square ChessBoard::getEnPassantSquare() const {
+        return m_boardState.enPassantSquare;
     }
 
     Bitboard ChessBoard::getAttackers(Square) {

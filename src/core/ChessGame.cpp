@@ -32,6 +32,11 @@ namespace Chess {
         m_selectedSquare = -1;
     }
 
+    void ChessGame::handleClickOnR() {
+        m_board.undoMove();
+        updateLegalMoves();
+    }
+
     bool ChessGame::isMoveLegal(Move &move) {
         // @TODO schnellere verarbeitung mit hashing
         for (size_t i = 0; i < m_legalMoves.size(); i++) {

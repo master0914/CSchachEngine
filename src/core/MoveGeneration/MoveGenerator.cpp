@@ -14,12 +14,14 @@ namespace Chess {
         auto start = Clock::now();
 
         generatePseudoLegalMoves(board, moveList, sideToMove);
-        filterIllegalMoves(board, moveList, sideToMove);
+        // filterIllegalMoves(board, moveList, sideToMove);
 
         auto end = Clock::now();
         auto elapsed =
             std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        std::cout << "Zeit: " << elapsed.count() << " ns\n";
+
+        // aktivieren für echte zeitmessung:
+        std::cout << "Zeit: " << elapsed.count() << " ns \n";
     }
 
     void MoveGenerator::generatePseudoLegalMoves(const ChessBoard &board, Movelist &moveList, Color sideToMove) {
@@ -343,6 +345,62 @@ namespace Chess {
     }
 
     void MoveGenerator::generateCastlingMoves(const ChessBoard &board, Movelist &moveList, Color color) {
+        CastlingRights rights = board.getCastlingRights();
+        if (!rights) {return;}
+        Color enemy = getOtherColor(color);
+        Square kingSquare = (color == Color::WHITE) ? Square::E1 : Square::E8;
+
+        if (isSquareAttacked(board,kingSquare, enemy)) {
+            return;
+        }
+
+        Bitboard occupied = board.getOccupied();
+
+        if (color == Color::WHITE) {
+            if (rights & WHITE_KINGSIDE) {
+                // sind die felder zwischen König und Turm frei?
+                if (!(occupied & CastlingMasks::WHITE_KINGSIDE_EMPTY).getValue()) {
+                    // werden die felder zwischen König und Turm angegriffen?
+                    if (!isSquareAttacked(board,Square::F1,enemy) &&
+                        !isSquareAttacked(board,Square::G1,enemy)) {
+                        addMove(moveList,makeCastlingMove(WHITE_KINGSIDE));
+                    }
+                }
+            }
+            if (rights & WHITE_QUEENSIDE) {
+                // sind die felder zwischen König und Turm frei?
+                if (!(occupied & CastlingMasks::WHITE_QUEENSIDE_EMPTY).getValue()) {
+                    // werden die felder zwischen König und Turm angegriffen?
+                    if (!isSquareAttacked(board,Square::C1,enemy) &&
+                        !isSquareAttacked(board,Square::D1,enemy)) {
+                        addMove(moveList,makeCastlingMove(WHITE_QUEENSIDE));
+                    }
+                }
+            }
+        }
+        else {
+            if (rights & BLACK_KINGSIDE) {
+                // sind die felder zwischen König und Turm frei?
+                if (!(occupied & CastlingMasks::BLACK_KINGSIDE_EMPTY).getValue()) {
+                    // werden die felder zwischen König und Turm angegriffen?
+                    if (!isSquareAttacked(board,Square::F8,enemy) &&
+                        !isSquareAttacked(board,Square::G8,enemy)) {
+                        addMove(moveList,makeCastlingMove(BLACK_KINGSIDE));
+                    }
+                }
+            }
+            if (rights & BLACK_QUEENSIDE) {
+                // sind die felder zwischen König und Turm frei?
+                if (!(occupied & CastlingMasks::BLACK_QUEENSIDE_EMPTY).getValue()) {
+                    // werden die felder zwischen König und Turm angegriffen?
+                    if (!isSquareAttacked(board,Square::C8,enemy) &&
+                        !isSquareAttacked(board,Square::D8,enemy)) {
+                        addMove(moveList,makeCastlingMove(BLACK_QUEENSIDE));
+                    }
+                }
+            }
+        }
+
     }
 
     bool MoveGenerator::isSquareAttacked(const ChessBoard &board, Square square, Color color) {
@@ -427,6 +485,8 @@ namespace Chess {
         Movelist legalMoves;
 
         for (int i = 0; i< moveList.size(); ++i) {
+            if (moveList[i].isCastle()) continue;  // castle hat seine eigene CheckPrüfung
+
             board.makeMove(moveList[i]);
             LOG_MOVEGEN("checking: " << moveList[i]);
             // @TODO vllt eigenes Tracking für könig im chessboard
@@ -444,5 +504,21 @@ namespace Chess {
         // eig nur zum debuggen der LOG wird im release entfernt
         LOG_MOVEGEN("adding move: " << move);
         moveList.add(move);
+    }
+
+    Move MoveGenerator::makeCastlingMove(CastlingRights type) {
+        switch (type) {
+            case WHITE_KINGSIDE:
+                return {4,6,Flag::CASTLE_KINGSIDE};
+            case BLACK_KINGSIDE:
+                return {60,62,Flag::CASTLE_KINGSIDE};
+            case WHITE_QUEENSIDE:
+                return {4,2,Flag::CASTLE_QUEENSIDE};
+            case BLACK_QUEENSIDE:
+                return {60,58,Flag::CASTLE_QUEENSIDE};
+            default:
+                LOG_WARN("Tried to make CastlingMove of type: NO_CASTLING or other invalid");
+                return {};
+        }
     }
 }

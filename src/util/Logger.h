@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include "LogConfig.h"
 
 namespace Chess {
     static constexpr const char* RESET = "\033[0m";
@@ -145,4 +146,10 @@ Chess::log(Chess::Level::Error, _oss.str(), __FILE__, __LINE__); \
 #define LOG_BOARD(msg) LOG_INFO(msg)
 #else
 #define LOG_BOARD(msg) ((void)0)
+#endif
+
+#if LOG_ENABLE_TIMING
+#define LOG_TIMING(msg) LOG_INFO(msg)
+#else
+#define LOG_TIMING(msg) ((void)0)
 #endif

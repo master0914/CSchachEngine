@@ -13,6 +13,9 @@ namespace Chess {
             m_game.handleRightClickOnSquare();
             return;
         }
+        if (m_context.input->isKeyJustPressed(Engine::KeyCode::KEY_R)) {
+            m_game.handleClickOnR();
+        }
 
         Engine::vec2 mouseScreenPos = m_context.input->getMousePosition();
         const bool isMouseOverBoard =
@@ -37,6 +40,7 @@ namespace Chess {
             int boardIndex = uiToBoardIndex(boardPosX, boardPosY);
             m_game.handleLeftClickOnSquare(boardIndex);
         }
+
 
     }
 
